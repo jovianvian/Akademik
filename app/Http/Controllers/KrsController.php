@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\AcademicEligibilityService;
+use App\Support\AcademicRuleSnapshotService;
 use App\Support\AuditLogger;
-use App\Support\AcademicSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,7 @@ class KrsController extends Controller
     {
         $tahunAktif = DB::table('tahun_akademik')->where('status_aktif', true)->first();
         $mahasiswa = $this->resolveMahasiswa();
-        $maxSks = $this->resolveMaxSks($mahasiswa?->id);
+        $maxSks = $this->resolveMaxSks($mahasiswa?->id, $tahunAktif?->id ? (int) $tahunAktif->id : null);
 
         $jadwal = collect();
         $selectedJadwalIds = [];
@@ -51,14 +52,9 @@ class KrsController extends Controller
             }
         }
 
-        $statusUkt = false;
-        if ($tahunAktif && $mahasiswa) {
-            $statusUkt = DB::table('tagihan_ukt')
-                ->where('mahasiswa_id', $mahasiswa->id)
-                ->where('tahun_akademik_id', $tahunAktif->id)
-                ->where('status', 'lunas')
-                ->exists();
-        }
+        $writeContext = ($tahunAktif && $mahasiswa)
+            ? AcademicEligibilityService::resolveWriteContext((int) $mahasiswa->id, (int) $tahunAktif->id)
+            : ['effective_eligibility' => false, 'krs_window_open' => false, 'ukt_paid' => false];
 
         return view('krs.index', [
             'title' => 'Isi KRS',
@@ -67,10 +63,10 @@ class KrsController extends Controller
             'selectedJadwalIds' => $selectedJadwalIds,
             'krsStatus' => $krsStatus,
             'statusAkademik' => [
-                'mahasiswa_aktif' => (bool) ($mahasiswa && $this->isEligibleForAcademicWrite($mahasiswa)),
+                'mahasiswa_aktif' => (bool) ($writeContext['effective_eligibility'] ?? false),
                 'periode_krs' => (bool) $tahunAktif,
-                'ukt_lunas' => $statusUkt,
-                'krs_window' => $this->isKrsWindowOpen($tahunAktif),
+                'ukt_lunas' => (bool) ($writeContext['ukt_paid'] ?? false),
+                'krs_window' => (bool) ($writeContext['krs_window_open'] ?? false),
             ],
         ]);
     }
@@ -92,24 +88,18 @@ class KrsController extends Controller
             ]);
         }
 
-        if (! $this->isEligibleForAcademicWrite($mahasiswa)) {
+        $writeContext = AcademicEligibilityService::resolveWriteContext((int) $mahasiswa->id, (int) $tahunAktif->id);
+        if (! ($writeContext['effective_eligibility'] ?? false)) {
             throw ValidationException::withMessages([
                 'jadwal_id' => 'Mahasiswa tidak memenuhi eligibility akademik untuk write KRS.',
             ]);
         }
-        if (! $this->isKrsWindowOpen($tahunAktif)) {
+        if (! ($writeContext['krs_window_open'] ?? false)) {
             throw ValidationException::withMessages([
                 'jadwal_id' => 'Periode KRS saat ini ditutup oleh admin akademik.',
             ]);
         }
-
-        $isUktLunas = DB::table('tagihan_ukt')
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->where('tahun_akademik_id', $tahunAktif->id)
-            ->where('status', 'lunas')
-            ->exists();
-
-        if (! $isUktLunas) {
+        if (! ($writeContext['ukt_paid'] ?? false)) {
             throw ValidationException::withMessages([
                 'jadwal_id' => 'KRS ditolak. Tagihan UKT belum lunas.',
             ]);
@@ -132,7 +122,7 @@ class KrsController extends Controller
         }
 
         $totalSks = (int) $selectedSchedules->sum('sks');
-        $maxSks = $this->resolveMaxSks($mahasiswa?->id);
+        $maxSks = $this->resolveMaxSks($mahasiswa?->id, (int) $tahunAktif->id);
         if ($totalSks > $maxSks) {
             throw ValidationException::withMessages([
                 'total_sks' => "Total SKS melebihi batas {$maxSks} SKS.",
@@ -214,20 +204,14 @@ class KrsController extends Controller
             return back()->withErrors(['krs' => 'Data mahasiswa atau tahun akademik aktif tidak ditemukan.']);
         }
 
-        if (! $this->isEligibleForAcademicWrite($mahasiswa)) {
+        $writeContext = AcademicEligibilityService::resolveWriteContext((int) $mahasiswa->id, (int) $tahunAktif->id);
+        if (! ($writeContext['effective_eligibility'] ?? false)) {
             return back()->withErrors(['krs' => 'Mahasiswa tidak memenuhi eligibility akademik untuk finalisasi KRS.']);
         }
-        if (! $this->isKrsWindowOpen($tahunAktif)) {
+        if (! ($writeContext['krs_window_open'] ?? false)) {
             return back()->withErrors(['krs' => 'Finalisasi KRS ditolak. Periode KRS sedang ditutup.']);
         }
-
-        $isUktLunas = DB::table('tagihan_ukt')
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->where('tahun_akademik_id', $tahunAktif->id)
-            ->where('status', 'lunas')
-            ->exists();
-
-        if (! $isUktLunas) {
+        if (! ($writeContext['ukt_paid'] ?? false)) {
             return back()->withErrors(['krs' => 'Finalisasi KRS gagal. Tagihan UKT semester aktif belum lunas.']);
         }
 
@@ -274,19 +258,14 @@ class KrsController extends Controller
             return back()->withErrors(['krs' => 'Data mahasiswa atau tahun akademik aktif tidak ditemukan.']);
         }
 
-        if (! $this->isKrsWindowOpen($tahunAktif)) {
+        $writeContext = AcademicEligibilityService::resolveWriteContext((int) $mahasiswa->id, (int) $tahunAktif->id);
+        if (! ($writeContext['krs_window_open'] ?? false)) {
             return back()->withErrors(['krs' => 'Generate otomatis ditolak. Periode KRS tidak aktif.']);
         }
-        if (! $this->isEligibleForAcademicWrite($mahasiswa)) {
+        if (! ($writeContext['effective_eligibility'] ?? false)) {
             return back()->withErrors(['krs' => 'Generate otomatis ditolak. Mahasiswa tidak eligible untuk write akademik.']);
         }
-
-        $isUktLunas = DB::table('tagihan_ukt')
-            ->where('mahasiswa_id', $mahasiswa->id)
-            ->where('tahun_akademik_id', $tahunAktif->id)
-            ->where('status', 'lunas')
-            ->exists();
-        if (! $isUktLunas) {
+        if (! ($writeContext['ukt_paid'] ?? false)) {
             return back()->withErrors(['krs' => 'Generate otomatis ditolak. UKT belum lunas.']);
         }
 
@@ -312,7 +291,7 @@ class KrsController extends Controller
             ->unique()
             ->all();
 
-        $maxSks = $this->resolveMaxSks($mahasiswa->id);
+        $maxSks = $this->resolveMaxSks($mahasiswa->id, (int) $tahunAktif->id);
         $selected = collect();
         foreach ($jadwal as $item) {
             if (in_array($item->mk_id, $passedMkIds, true)) {
@@ -418,40 +397,27 @@ class KrsController extends Controller
         return DB::table('mahasiswa')->orderBy('id')->first();
     }
 
-    private function isKrsWindowOpen($tahunAktif): bool
+    private function resolveMaxSks(?int $mahasiswaId, ?int $targetTahunAkademikId = null): int
     {
-        if (! $tahunAktif || ! $tahunAktif->krs_dibuka) {
-            return false;
+        $targetTahunAkademikId ??= (int) DB::table('tahun_akademik')->where('status_aktif', true)->value('id');
+
+        if (! $targetTahunAkademikId) {
+            return 24;
         }
 
-        $now = now();
-        $globalOpen = AcademicSetting::krsOpenAt();
-        $globalClose = AcademicSetting::krsCloseAt();
-        if ($globalOpen && $now->lt($globalOpen)) {
-            return false;
-        }
-        if ($globalClose && $now->gt($globalClose)) {
-            return false;
-        }
-        if ($tahunAktif->krs_mulai && $now->lt($tahunAktif->krs_mulai)) {
-            return false;
-        }
-        if ($tahunAktif->krs_selesai && $now->gt($tahunAktif->krs_selesai)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private function isEligibleForAcademicWrite(object $mahasiswa): bool
-    {
-        return $mahasiswa->status_akademik === 'aktif';
-    }
-
-    private function resolveMaxSks(?int $mahasiswaId): int
-    {
         if (! $mahasiswaId) {
-            return AcademicSetting::maxSksDefault();
+            return AcademicRuleSnapshotService::maxSksByIps(0.0, $targetTahunAkademikId);
+        }
+
+        $latestKrs = DB::table('krs')
+            ->where('mahasiswa_id', $mahasiswaId)
+            ->where('status_krs', 'final')
+            ->orderByDesc('id')
+            ->select('id', 'tahun_akademik_id')
+            ->first();
+
+        if (! $latestKrs) {
+            return AcademicRuleSnapshotService::maxSksByIps(0.0, $targetTahunAkademikId);
         }
 
         $latest = DB::table('krs as k')
@@ -459,37 +425,22 @@ class KrsController extends Controller
             ->join('nilai as n', 'n.krs_detail_id', '=', 'kd.id')
             ->join('jadwal as j', 'j.id', '=', 'kd.jadwal_id')
             ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
-            ->where('k.mahasiswa_id', $mahasiswaId)
-            ->where('k.status_krs', 'final')
+            ->where('k.id', $latestKrs->id)
             ->select('mk.sks', 'n.nilai_huruf')
             ->get();
 
         if ($latest->isEmpty()) {
-            return AcademicSetting::maxSksDefault();
+            return AcademicRuleSnapshotService::maxSksByIps(0.0, $targetTahunAkademikId);
         }
 
         $totalSks = (int) $latest->sum('sks');
         $totalBobot = 0.0;
         foreach ($latest as $row) {
-            $totalBobot += ((int) $row->sks) * $this->toBobot($row->nilai_huruf);
+            $totalBobot += ((int) $row->sks) * AcademicRuleSnapshotService::gradePoint((string) $row->nilai_huruf, (int) $latestKrs->tahun_akademik_id);
         }
         $ips = $totalSks > 0 ? $totalBobot / $totalSks : 0;
 
-        return $ips >= 3.0 ? AcademicSetting::maxSksIps3() : AcademicSetting::maxSksDefault();
-    }
-
-    private function toBobot(?string $huruf): float
-    {
-        return match ($huruf) {
-            'A' => 4.0,
-            'A-' => 3.7,
-            'B+' => 3.3,
-            'B' => 3.0,
-            'B-' => 2.7,
-            'C+' => 2.3,
-            'C' => 2.0,
-            'D' => 1.0,
-            default => 0.0,
-        };
+        return AcademicRuleSnapshotService::maxSksByIps($ips, $targetTahunAkademikId);
     }
 }
+

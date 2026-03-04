@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Support\PdfDocumentMeta;
 use App\Support\AcademicSetting;
+use App\Support\AcademicEligibilityService;
+use App\Support\AcademicRuleSnapshotService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +52,7 @@ class MahasiswaController extends Controller
             $ipsNumerator = 0.0;
 
             foreach ($items as $item) {
-                $ipsNumerator += ((int) $item->sks) * $this->toBobot($item->nilai_huruf);
+                $ipsNumerator += ((int) $item->sks) * AcademicRuleSnapshotService::gradePoint((string) $item->nilai_huruf, (int) $item->tahun_akademik_id);
             }
 
             $ips = $totalSks > 0 ? round($ipsNumerator / $totalSks, 2) : 0;
@@ -304,6 +306,7 @@ class MahasiswaController extends Controller
             ->where('k.mahasiswa_id', $mahasiswaId)
             ->select(
                 'k.id as krs_id',
+                'k.tahun_akademik_id',
                 'ta.tahun',
                 'ta.semester',
                 'k.status_krs',
@@ -322,23 +325,13 @@ class MahasiswaController extends Controller
         return $query->get();
     }
 
-    private function toBobot(?string $huruf): float
-    {
-        return match ($huruf) {
-            'A' => 4.0,
-            'A-' => 3.7,
-            'B+' => 3.3,
-            'B' => 3.0,
-            'B-' => 2.7,
-            'C+' => 2.3,
-            'C' => 2.0,
-            'D' => 1.0,
-            default => 0.0,
-        };
-    }
-
     private function isEligibleForAcademicWrite(object $mahasiswa): bool
     {
-        return $mahasiswa->status_akademik === 'aktif';
+        $tahunAktifId = (int) DB::table('tahun_akademik')->where('status_aktif', true)->value('id');
+        if (! $tahunAktifId) {
+            return false;
+        }
+
+        return AcademicEligibilityService::isEligibleForAcademicWrite((int) $mahasiswa->id, $tahunAktifId);
     }
 }

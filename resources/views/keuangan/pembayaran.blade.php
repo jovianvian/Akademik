@@ -7,7 +7,7 @@
             <form action="{{ route('keuangan.pembayaran.store') }}" method="POST" class="mt-4 space-y-3">
                 @csrf
                 <select name="tagihan_id" class="input-text">
-                    <option value="">Pilih tagihan menunggu</option>
+                    <option value="">Pilih tagihan open/partial</option>
                     @foreach($tagihanMenunggu as $t)
                         <option value="{{ $t->id }}">
                             {{ $t->nim }} - {{ $t->nama }} ({{ $t->tahun }} {{ ucfirst($t->semester) }}) Rp{{ number_format($t->jumlah,0,',','.') }}

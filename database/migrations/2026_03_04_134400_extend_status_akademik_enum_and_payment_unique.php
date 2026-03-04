@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
@@ -8,6 +9,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('pembayaran', function (Blueprint $table) {
+                $table->unique(['tagihan_id', 'tanggal_bayar', 'jumlah_bayar', 'metode_bayar'], 'pembayaran_dup_guard_unique');
+            });
+
+            return;
+        }
+
         DB::statement("
             ALTER TABLE mahasiswa
             MODIFY COLUMN status_akademik ENUM('aktif','nonaktif','do','alumni','suspended','suspended_pending_decision')
@@ -31,6 +40,14 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (DB::getDriverName() === 'sqlite') {
+            Schema::table('pembayaran', function (Blueprint $table) {
+                $table->dropUnique('pembayaran_dup_guard_unique');
+            });
+
+            return;
+        }
+
         Schema::table('pembayaran', function ($table) {
             $table->dropUnique('pembayaran_dup_guard_unique');
         });

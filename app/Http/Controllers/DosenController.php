@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Support\AuditLogger;
 use App\Support\AcademicSetting;
+use App\Support\AcademicEligibilityService;
+use App\Support\AcademicRuleSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -140,7 +142,7 @@ class DosenController extends Controller
         $krsLock = DB::table('krs_detail as kd')
             ->join('krs as k', 'k.id', '=', 'kd.krs_id')
             ->where('kd.id', $validated['krs_detail_id'])
-            ->select('k.id', 'k.nilai_terkunci')
+            ->select('k.id', 'k.nilai_terkunci', 'k.tahun_akademik_id')
             ->first();
 
         if ($krsLock && (bool) $krsLock->nilai_terkunci) {
@@ -163,20 +165,30 @@ class DosenController extends Controller
             }
         }
 
-        $statusAkademikMhs = DB::table('krs_detail as kd')
+        $rowMhs = DB::table('krs_detail as kd')
             ->join('krs as k', 'k.id', '=', 'kd.krs_id')
             ->join('mahasiswa as m', 'm.id', '=', 'k.mahasiswa_id')
             ->where('kd.id', $validated['krs_detail_id'])
-            ->value('m.status_akademik');
+            ->select('m.id as mahasiswa_id', 'k.tahun_akademik_id')
+            ->first();
 
-        if (in_array($statusAkademikMhs, ['suspended', 'suspended_pending_decision'], true)) {
+        if (! $rowMhs || ! AcademicEligibilityService::isEligibleForAcademicWrite((int) $rowMhs->mahasiswa_id, (int) $rowMhs->tahun_akademik_id)) {
             throw ValidationException::withMessages([
-                'nilai_angka' => 'Input nilai diblokir karena status akademik mahasiswa sedang suspended.',
+                'nilai_angka' => 'Input nilai diblokir karena eligibility akademik mahasiswa tidak eligible.',
             ]);
         }
 
+        if (! $krsLock?->tahun_akademik_id) {
+            throw ValidationException::withMessages([
+                'nilai_angka' => 'Tahun akademik pada KRS tidak ditemukan.',
+            ]);
+        }
+
+        $tahunAkademikId = (int) $krsLock->tahun_akademik_id;
+        $snapshotRules = AcademicRuleSnapshotService::rulesForYear($tahunAkademikId);
+
         if ($hasBreakdown) {
-            $bobot = AcademicSetting::bobotNilai();
+            $bobot = $snapshotRules['nilai_bobot'] ?? AcademicSetting::bobotNilai();
             $angka = (
                 ((float) $validated['nilai_tugas'] * (float) ($bobot['tugas'] ?? 30)) +
                 ((float) $validated['nilai_uts'] * (float) ($bobot['uts'] ?? 25)) +
@@ -192,7 +204,7 @@ class DosenController extends Controller
             $angka = (float) $validated['nilai_angka'];
         }
 
-        $huruf = $this->toHuruf($angka);
+        $huruf = AcademicRuleSnapshotService::toHuruf($angka, $tahunAkademikId);
 
         DB::table('nilai')->updateOrInsert(
             ['krs_detail_id' => $validated['krs_detail_id']],
@@ -289,17 +301,4 @@ class DosenController extends Controller
         return (int) DB::table('dosen')->where('user_id', $user->id)->value('id');
     }
 
-    private function toHuruf(float $nilai): string
-    {
-        $ranges = AcademicSetting::gradeRanges();
-        usort($ranges, fn ($a, $b) => (float) $b['min'] <=> (float) $a['min']);
-
-        foreach ($ranges as $range) {
-            if ($nilai >= (float) ($range['min'] ?? 0)) {
-                return strtoupper((string) ($range['grade'] ?? 'E'));
-            }
-        }
-
-        return 'E';
-    }
 }

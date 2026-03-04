@@ -7,6 +7,12 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Project Governance Docs
+
+- Soft delete & recovery policy: `docs/soft-delete-governance.md`
+- Edge-case review: `docs/edge-case-review.md`
+- Academic rule snapshot is stored per `tahun_akademik` in `academic_rule_snapshots` (immutable after lock/finalisasi KHS).
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

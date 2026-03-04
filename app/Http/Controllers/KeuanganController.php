@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Support\AuditLogger;
+use App\Support\FinancialImpactService;
 use App\Support\PdfDocumentMeta;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
@@ -32,9 +33,11 @@ class KeuanganController extends Controller
             ->get();
 
         $monitoring = [
-            'menunggu' => $tagihan->where('status', 'menunggu')->count(),
-            'lunas' => $tagihan->where('status', 'lunas')->count(),
-            'ditolak' => $tagihan->where('status', 'ditolak')->count(),
+            'open' => $tagihan->where('status', 'open')->count(),
+            'partial' => $tagihan->where('status', 'partial')->count(),
+            'paid' => $tagihan->where('status', 'paid')->count(),
+            'disputed' => $tagihan->where('status', 'disputed')->count(),
+            'void' => $tagihan->where('status', 'void')->count(),
         ];
 
         return view('keuangan.tagihan', [
@@ -65,7 +68,7 @@ class KeuanganController extends Controller
 
         DB::table('tagihan_ukt')->insert([
             ...$validated,
-            'status' => 'menunggu',
+            'status' => 'open',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -90,34 +93,22 @@ class KeuanganController extends Controller
     public function updateStatusTagihan(Request $request, int $id)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:menunggu,lunas,ditolak'],
+            'status' => ['required', 'in:open,partial,paid,disputed,void'],
         ]);
 
-        if ($validated['status'] === 'ditolak') {
-            $tagihan = DB::table('tagihan_ukt')->where('id', $id)->first();
-            if ($tagihan) {
-                $hasFinalKrs = DB::table('krs')
-                    ->where('mahasiswa_id', $tagihan->mahasiswa_id)
-                    ->where('tahun_akademik_id', $tagihan->tahun_akademik_id)
-                    ->where('status_krs', 'final')
-                    ->exists();
-                if ($hasFinalKrs) {
-                    return back()->withErrors(['status' => 'Status tagihan tidak bisa ditolak karena KRS semester ini sudah final.']);
-                }
-            }
-        }
-
+        $before = DB::table('tagihan_ukt')->where('id', $id)->value('status');
         DB::table('tagihan_ukt')->where('id', $id)->update([
             'status' => $validated['status'],
             'updated_at' => now(),
         ]);
+        FinancialImpactService::applyTagihanStatusImpact($id, $validated['status'], auth()->id(), 'Perubahan status tagihan via admin keuangan.');
 
         AuditLogger::log(
             aksi: 'Ubah status tagihan UKT',
             modul: 'keuangan',
             entityType: 'tagihan_ukt',
             entityId: $id,
-            konteks: ['status' => $validated['status']],
+            konteks: ['before' => $before, 'after' => $validated['status']],
             request: $request
         );
 
@@ -164,7 +155,7 @@ class KeuanganController extends Controller
         $tagihanMenunggu = DB::table('tagihan_ukt as t')
             ->join('mahasiswa as m', 'm.id', '=', 't.mahasiswa_id')
             ->join('tahun_akademik as ta', 'ta.id', '=', 't.tahun_akademik_id')
-            ->where('t.status', 'menunggu')
+            ->whereIn('t.status', ['open', 'partial'])
             ->select('t.id', 'm.nim', 'm.nama', 'ta.tahun', 'ta.semester', 't.jumlah')
             ->orderByDesc('t.id')
             ->get();
@@ -239,12 +230,19 @@ class KeuanganController extends Controller
                     ->where('tagihan_id', $validated['tagihan_id'])
                     ->lockForUpdate()
                     ->sum('jumlah_bayar');
-                $statusBaru = $totalBayar >= $tagihan->jumlah ? 'lunas' : 'menunggu';
+                $statusBaru = $totalBayar >= $tagihan->jumlah ? 'paid' : 'partial';
 
                 DB::table('tagihan_ukt')->where('id', $validated['tagihan_id'])->update([
                     'status' => $statusBaru,
                     'updated_at' => now(),
                 ]);
+
+                FinancialImpactService::applyTagihanStatusImpact(
+                    (int) $validated['tagihan_id'],
+                    $statusBaru,
+                    auth()->id(),
+                    'Rekalkulasi status tagihan setelah input pembayaran.'
+                );
             });
         } catch (\RuntimeException $e) {
             return back()->withErrors(['jumlah_bayar' => $e->getMessage()])->withInput();

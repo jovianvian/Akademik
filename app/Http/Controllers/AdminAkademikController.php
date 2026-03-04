@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Support\AuditLogger;
 use App\Support\AcademicSetting;
+use App\Support\AcademicStatusMutationService;
+use App\Support\AcademicRuleSnapshotService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +40,7 @@ class AdminAkademikController extends Controller
         ];
 
         DB::table('tahun_akademik')->where('id', $id)->update($payload);
+        AcademicRuleSnapshotService::getOrCreate($id, auth()->id());
 
         AuditLogger::log(
             aksi: 'Update periode KRS',
@@ -113,11 +116,17 @@ class AdminAkademikController extends Controller
             return back()->withErrors(['khs' => 'Generate KHS gagal. Masih ada nilai yang belum diinput dosen.']);
         }
 
+        $krsRow = DB::table('krs')->where('id', $krsId)->select('tahun_akademik_id')->first();
+
         DB::table('krs')->where('id', $krsId)->update([
             'status_krs' => 'final',
             'nilai_terkunci' => true,
             'updated_at' => now(),
         ]);
+        if ($krsRow) {
+            AcademicRuleSnapshotService::getOrCreate((int) $krsRow->tahun_akademik_id, auth()->id());
+            AcademicRuleSnapshotService::lock((int) $krsRow->tahun_akademik_id);
+        }
 
         AuditLogger::log(
             aksi: 'Generate/finalisasi KHS',
@@ -161,13 +170,26 @@ class AdminAkademikController extends Controller
 
         $items = DB::table('mahasiswa as m')
             ->join('program_studi as p', 'p.id', '=', 'm.prodi_id')
+            ->leftJoin('mahasiswa_period_status as mps', function ($join) use ($tahunAktif) {
+                $join->on('mps.mahasiswa_id', '=', 'm.id');
+                if ($tahunAktif) {
+                    $join->where('mps.tahun_akademik_id', '=', $tahunAktif->id)
+                        ->whereNull('mps.effective_until');
+                }
+            })
             ->leftJoin('tagihan_ukt as t', function ($join) use ($tahunAktif) {
                 $join->on('t.mahasiswa_id', '=', 'm.id');
                 if ($tahunAktif) {
                     $join->where('t.tahun_akademik_id', '=', $tahunAktif->id);
                 }
             })
-            ->select('m.*', 'p.nama_prodi', 't.status as status_tagihan_aktif')
+            ->select(
+                'm.*',
+                'p.nama_prodi',
+                't.status as status_tagihan_aktif',
+                'mps.eligibility_status',
+                'mps.reason as eligibility_reason'
+            )
             ->orderBy('m.nim')
             ->get();
 
@@ -175,7 +197,7 @@ class AdminAkademikController extends Controller
             'title' => 'Status Mahasiswa',
             'items' => $items,
             'tahunAktif' => $tahunAktif,
-            'statusOptions' => ['aktif', 'nonaktif', 'suspended_pending_decision', 'suspended', 'do', 'alumni'],
+            'statusOptions' => ['eligible', 'suspended_pending_decision', 'suspended'],
             'statusLogs' => DB::table('mahasiswa_status_logs as l')
                 ->join('mahasiswa as m', 'm.id', '=', 'l.mahasiswa_id')
                 ->leftJoin('users as u', 'u.id', '=', 'l.changed_by')
@@ -189,7 +211,7 @@ class AdminAkademikController extends Controller
     public function updateMahasiswaStatus(Request $request, int $id)
     {
         $validated = $request->validate([
-            'status_akademik' => ['required', 'in:aktif,nonaktif,suspended_pending_decision,suspended,do,alumni'],
+            'eligibility_status' => ['required', 'in:eligible,suspended_pending_decision,suspended'],
             'catatan_status' => ['nullable', 'max:255'],
         ]);
 
@@ -198,33 +220,26 @@ class AdminAkademikController extends Controller
             return back()->withErrors(['status' => 'Mahasiswa tidak ditemukan.']);
         }
 
-        DB::table('mahasiswa')->where('id', $id)->update([
-            'status_akademik' => $validated['status_akademik'],
-            'catatan_status' => $validated['catatan_status'] ?? null,
-            'updated_at' => now(),
-        ]);
+        $tahunAktifId = (int) DB::table('tahun_akademik')->where('status_aktif', true)->value('id');
+        if (! $tahunAktifId) {
+            return back()->withErrors(['status' => 'Tahun akademik aktif tidak ditemukan.']);
+        }
 
-        DB::table('mahasiswa_status_logs')->insert([
-            'mahasiswa_id' => $id,
-            'changed_by' => auth()->id(),
-            'status_lama' => $mahasiswa->status_akademik,
-            'status_baru' => $validated['status_akademik'],
-            'sumber' => 'manual',
-            'catatan' => $validated['catatan_status'] ?? null,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        try {
+            $changed = AcademicStatusMutationService::mutatePeriodEligibility(
+                $id,
+                $tahunAktifId,
+                $validated['eligibility_status'],
+                'manual',
+                $validated['catatan_status'] ?? null,
+                auth()->id(),
+                $request
+            );
+        } catch (\RuntimeException $e) {
+            return back()->withErrors(['status' => $e->getMessage()])->withInput();
+        }
 
-        AuditLogger::log(
-            aksi: 'Update status mahasiswa',
-            modul: 'akademik',
-            entityType: 'mahasiswa',
-            entityId: $id,
-            konteks: $validated,
-            request: $request
-        );
-
-        return back()->with('success', 'Status mahasiswa berhasil diperbarui.');
+        return back()->with('success', $changed ? 'Status mahasiswa berhasil diperbarui.' : 'Status mahasiswa tidak berubah.');
     }
 
     public function syncStatusByUkt(Request $request)
@@ -243,39 +258,38 @@ class AdminAkademikController extends Controller
                 $join->on('t.mahasiswa_id', '=', 'm.id')
                     ->where('t.tahun_akademik_id', '=', $tahunAktif->id);
             })
-            ->whereNotIn('m.status_akademik', ['do', 'alumni', 'suspended', 'suspended_pending_decision'])
+            ->whereNotIn('m.enrollment_status_current', ['do', 'lulus'])
             ->select('m.id', 't.status as status_tagihan')
             ->get();
 
         $updated = 0;
         foreach ($rows as $row) {
-            $newStatus = $row->status_tagihan === 'lunas' ? 'aktif' : 'nonaktif';
-            $current = DB::table('mahasiswa')->where('id', $row->id)->first();
-            if (! $current || $current->status_akademik === $newStatus) {
-                continue;
-            }
+            $newStatus = match ($row->status_tagihan) {
+                'paid' => 'eligible',
+                'disputed', 'void' => 'suspended_pending_decision',
+                default => 'suspended',
+            };
 
-            $catatan = $newStatus === 'nonaktif'
-                ? 'Nonaktif otomatis: tagihan UKT belum lunas pada periode aktif.'
+            $catatan = $newStatus !== 'eligible'
+                ? 'Update otomatis eligibility: status UKT periode aktif tidak paid.'
                 : null;
 
-            DB::table('mahasiswa')->where('id', $row->id)->update([
-                'status_akademik' => $newStatus,
-                'catatan_status' => $catatan,
-                'updated_at' => now(),
-            ]);
-
-            DB::table('mahasiswa_status_logs')->insert([
-                'mahasiswa_id' => $row->id,
-                'changed_by' => auth()->id(),
-                'status_lama' => $current->status_akademik,
-                'status_baru' => $newStatus,
-                'sumber' => 'sinkron_ukt',
-                'catatan' => $catatan,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            $updated++;
+            try {
+                $changed = AcademicStatusMutationService::mutatePeriodEligibility(
+                    $row->id,
+                    $tahunAktif->id,
+                    $newStatus,
+                    'sinkron_ukt',
+                    $catatan,
+                    auth()->id(),
+                    $request
+                );
+            } catch (\RuntimeException) {
+                continue;
+            }
+            if ($changed) {
+                $updated++;
+            }
         }
 
         AuditLogger::log(

@@ -81,8 +81,10 @@ class AuthController extends Controller
         $target = '/dashboard';
 
         if ($user?->hasRole('mahasiswa')) {
-            $statusAkademik = DB::table('mahasiswa')->where('user_id', $user->id)->value('status_akademik');
-            if ($statusAkademik === 'do') {
+            $mhs = DB::table('mahasiswa')->where('user_id', $user->id)->select('status_akademik', 'enrollment_status_current')->first();
+            $statusAkademik = (string) ($mhs->status_akademik ?? 'aktif');
+            $enrollment = (string) ($mhs->enrollment_status_current ?? 'aktif');
+            if ($enrollment === 'do') {
                 $this->logAttempt($credentials['email'], false, $request);
                 Auth::logout();
                 $request->session()->invalidate();
@@ -91,7 +93,7 @@ class AuthController extends Controller
                     'email' => 'Akun mahasiswa dengan status DO dinonaktifkan untuk login.',
                 ])->onlyInput('email');
             }
-            $target = in_array($statusAkademik, ['do', 'alumni'], true) ? '/khs' : '/krs';
+            $target = in_array($enrollment, ['lulus', 'do'], true) || in_array($statusAkademik, ['do', 'alumni'], true) ? '/khs' : '/krs';
         } elseif ($user?->hasRole('admin_akademik')) {
             $target = '/master/fakultas';
         } elseif ($user?->hasRole('admin_keuangan')) {

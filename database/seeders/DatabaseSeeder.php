@@ -197,7 +197,7 @@ class DatabaseSeeder extends Seeder
             'mahasiswa_id' => 1,
             'tahun_akademik_id' => 1,
             'jumlah' => 4500000,
-            'status' => 'lunas',
+            'status' => 'paid',
             'created_at' => $now,
             'updated_at' => $now,
         ]);

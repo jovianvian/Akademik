@@ -4,16 +4,16 @@
     <section class="grid grid-cols-12 gap-4 md:gap-6">
         <article class="col-span-12 grid grid-cols-1 gap-3 md:grid-cols-3">
             <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-theme-sm">
-                <p class="text-sm text-gray-500">Tagihan Menunggu</p>
-                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $monitoring['menunggu'] }}</p>
+                <p class="text-sm text-gray-500">Tagihan Open/Partial</p>
+                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ ($monitoring['open'] ?? 0) + ($monitoring['partial'] ?? 0) }}</p>
             </div>
             <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-theme-sm">
-                <p class="text-sm text-gray-500">Tagihan Lunas</p>
-                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $monitoring['lunas'] }}</p>
+                <p class="text-sm text-gray-500">Tagihan Paid</p>
+                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $monitoring['paid'] ?? 0 }}</p>
             </div>
             <div class="p-4 bg-white border border-gray-200 rounded-xl shadow-theme-sm">
-                <p class="text-sm text-gray-500">Tagihan Ditolak</p>
-                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ $monitoring['ditolak'] }}</p>
+                <p class="text-sm text-gray-500">Tagihan Disputed/Void</p>
+                <p class="mt-1 text-2xl font-semibold text-gray-900">{{ ($monitoring['disputed'] ?? 0) + ($monitoring['void'] ?? 0) }}</p>
             </div>
         </article>
 
@@ -65,9 +65,11 @@
                                     @csrf
                                     @method('PATCH')
                                     <select name="status" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
-                                        <option value="menunggu" @selected($item->status === 'menunggu')>Menunggu</option>
-                                        <option value="lunas" @selected($item->status === 'lunas')>Lunas</option>
-                                        <option value="ditolak" @selected($item->status === 'ditolak')>Ditolak</option>
+                                        <option value="open" @selected($item->status === 'open')>Open</option>
+                                        <option value="partial" @selected($item->status === 'partial')>Partial</option>
+                                        <option value="paid" @selected($item->status === 'paid')>Paid</option>
+                                        <option value="disputed" @selected($item->status === 'disputed')>Disputed</option>
+                                        <option value="void" @selected($item->status === 'void')>Void</option>
                                     </select>
                                     <button class="px-2 py-1 text-xs text-white rounded bg-brand-500">Update</button>
                                 </form>
@@ -82,4 +84,3 @@
         </article>
     </section>
 @endsection
-

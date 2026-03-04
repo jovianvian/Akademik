@@ -21,7 +21,7 @@ class DashboardController extends Controller
         $dosenAktif = DB::table('dosen')->count();
         $mkDitawarkan = DB::table('jadwal')->whereNull('deleted_at')->distinct('mata_kuliah_id')->count('mata_kuliah_id');
         $totalTagihan = DB::table('tagihan_ukt')->count();
-        $tagihanLunas = DB::table('tagihan_ukt')->where('status', 'lunas')->count();
+        $tagihanLunas = DB::table('tagihan_ukt')->where('status', 'paid')->count();
         $persenLunas = $totalTagihan > 0 ? round(($tagihanLunas / $totalTagihan) * 100) : 0;
         $tahunAktif = DB::table('tahun_akademik')->where('status_aktif', true)->first();
         $krsStatus = DB::table('krs')
@@ -171,7 +171,7 @@ class DashboardController extends Controller
                 if (($krsAktif?->status_krs ?? null) !== 'final') {
                     $notifikasi[] = 'KRS semester aktif belum final.';
                 }
-                if ($uktStatus !== 'lunas') {
+                if ($uktStatus !== 'paid') {
                     $notifikasi[] = 'Tagihan UKT semester aktif belum lunas.';
                 }
                 if ($mahasiswa->status_akademik !== 'aktif') {
@@ -260,21 +260,21 @@ class DashboardController extends Controller
             $totalBelumAktif = 0;
             if ($tahunAktif) {
                 $totalTagihanAktif = (int) DB::table('tagihan_ukt')->where('tahun_akademik_id', $tahunAktif->id)->count();
-                $totalLunasAktif = (int) DB::table('tagihan_ukt')->where('tahun_akademik_id', $tahunAktif->id)->where('status', 'lunas')->count();
-                $totalBelumAktif = (int) DB::table('tagihan_ukt')->where('tahun_akademik_id', $tahunAktif->id)->whereIn('status', ['menunggu', 'ditolak'])->count();
+                $totalLunasAktif = (int) DB::table('tagihan_ukt')->where('tahun_akademik_id', $tahunAktif->id)->where('status', 'paid')->count();
+                $totalBelumAktif = (int) DB::table('tagihan_ukt')->where('tahun_akademik_id', $tahunAktif->id)->whereIn('status', ['open', 'partial', 'disputed', 'void'])->count();
             }
 
             $cards = [
                 ['label' => 'Tagihan Semester Ini', 'value' => number_format($totalTagihanAktif), 'hint' => 'Berdasarkan tahun akademik aktif'],
-                ['label' => 'Tagihan Lunas', 'value' => number_format($totalLunasAktif), 'hint' => 'Status lunas'],
-                ['label' => 'Belum Bayar', 'value' => number_format($totalBelumAktif), 'hint' => 'Menunggu/ditolak'],
+                ['label' => 'Tagihan Paid', 'value' => number_format($totalLunasAktif), 'hint' => 'Status paid'],
+                ['label' => 'Belum Clear', 'value' => number_format($totalBelumAktif), 'hint' => 'Open/partial/disputed/void'],
                 ['label' => 'Pembayaran Hari Ini', 'value' => 'Rp'.number_format((float) DB::table('pembayaran')->whereDate('tanggal_bayar', now()->toDateString())->sum('jumlah_bayar'), 0, ',', '.'), 'hint' => 'Total transaksi hari ini'],
             ];
 
             $operationalCards = [
                 [
                     'title' => 'Tagihan Menunggu',
-                    'value' => DB::table('tagihan_ukt')->where('status', 'menunggu')->count(),
+                    'value' => DB::table('tagihan_ukt')->whereIn('status', ['open', 'partial'])->count(),
                     'link' => route('keuangan.tagihan.index'),
                 ],
                 [

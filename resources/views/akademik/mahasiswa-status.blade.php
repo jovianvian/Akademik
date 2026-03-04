@@ -23,7 +23,7 @@
                         <th class="px-4 py-3 text-left">Mahasiswa</th>
                         <th class="px-4 py-3 text-left">Prodi</th>
                         <th class="px-4 py-3 text-left">Status UKT Aktif</th>
-                        <th class="px-4 py-3 text-left">Status Akademik</th>
+                        <th class="px-4 py-3 text-left">Eligibility Periode</th>
                         <th class="px-4 py-3 text-left">Catatan</th>
                         <th class="px-4 py-3 text-left">Aksi</th>
                     </tr>
@@ -38,14 +38,14 @@
                                 <form method="POST" action="{{ route('akademik.mahasiswa-status.update', $item->id) }}" class="flex items-center gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <select name="status_akademik" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="eligibility_status" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
                                         @foreach($statusOptions as $status)
-                                            <option value="{{ $status }}" @selected($item->status_akademik === $status)>{{ $status }}</option>
+                                            <option value="{{ $status }}" @selected(($item->eligibility_status ?? 'eligible') === $status)>{{ $status }}</option>
                                         @endforeach
                                     </select>
                             </td>
                             <td class="px-4 py-3">
-                                    <input type="text" name="catatan_status" value="{{ $item->catatan_status }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-64">
+                                    <input type="text" name="catatan_status" value="{{ $item->eligibility_reason ?? $item->catatan_status }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-64">
                             </td>
                             <td class="px-4 py-3">
                                     <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Update</button>
