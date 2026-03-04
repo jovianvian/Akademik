@@ -167,6 +167,16 @@ class DatabaseSeeder extends Seeder
             'updated_at' => $now,
         ]);
 
+        DB::table('jabatan_dosen')->insert([
+            'dosen_id' => 1,
+            'jabatan' => 'Dosen PA',
+            'periode_mulai' => '2025-08-01',
+            'periode_selesai' => null,
+            'status_aktif' => true,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
         DB::table('mahasiswa')->insert([
             'nim' => '23010001',
             'nama' => 'Mahasiswa Satu',
@@ -175,6 +185,16 @@ class DatabaseSeeder extends Seeder
             'status_mahasiswa' => 'aktif',
             'status_akademik' => 'aktif',
             'user_id' => 3,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        DB::table('dosen_pa_mahasiswa')->insert([
+            'dosen_id' => 1,
+            'mahasiswa_id' => 1,
+            'periode_mulai' => '2025-08-01',
+            'periode_selesai' => null,
+            'status_aktif' => true,
             'created_at' => $now,
             'updated_at' => $now,
         ]);
@@ -198,6 +218,17 @@ class DatabaseSeeder extends Seeder
             'tahun_akademik_id' => 1,
             'jumlah' => 4500000,
             'status' => 'paid',
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        DB::table('pembayaran')->insert([
+            'tagihan_id' => 1,
+            'tanggal_bayar' => now()->toDateString(),
+            'jumlah_bayar' => 4500000,
+            'metode_bayar' => 'transfer',
+            'bukti_bayar' => 'TRX-DEMO-UKT-23010001',
+            'is_reconciliation_error' => false,
             'created_at' => $now,
             'updated_at' => $now,
         ]);
