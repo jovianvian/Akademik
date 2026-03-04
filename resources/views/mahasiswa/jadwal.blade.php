@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -8,8 +8,8 @@
                 Tahun Akademik Aktif: {{ $tahunAktif ? $tahunAktif->tahun.' '.ucfirst($tahunAktif->semester) : '-' }}
             </p>
 
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Hari</th>
@@ -41,3 +41,4 @@
         </article>
     </section>
 @endsection
+

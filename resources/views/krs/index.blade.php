@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -35,8 +35,8 @@
             <form action="{{ route('krs.store') }}" method="POST" class="mt-4">
                 @csrf
                 <input type="hidden" name="total_sks" id="totalSksInput" value="0" data-max-sks="{{ $maxSks }}">
-                <div class="overflow-hidden border border-gray-200 rounded-xl">
-                    <table class="w-full text-sm">
+                <div class="table-wrap">
+                    <table class="table-base">
                         <thead class="bg-gray-50">
                         <tr class="text-left text-gray-600">
                             <th class="px-4 py-3">Pilih</th>
@@ -104,3 +104,4 @@
         </article>
     </section>
 @endsection
+

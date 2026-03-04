@@ -303,4 +303,162 @@ class AdminAkademikController extends Controller
 
         return back()->with('success', "Sinkron status mahasiswa selesai. {$updated} data diperbarui.");
     }
+
+    public function monitoringKrs(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+
+        $query = DB::table('krs as k')
+            ->join('mahasiswa as m', 'm.id', '=', 'k.mahasiswa_id')
+            ->join('program_studi as p', 'p.id', '=', 'm.prodi_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'k.tahun_akademik_id')
+            ->leftJoin('krs_detail as kd', 'kd.krs_id', '=', 'k.id')
+            ->select(
+                'k.id',
+                'm.nim',
+                'm.nama',
+                'p.nama_prodi',
+                'ta.tahun',
+                'ta.semester',
+                'k.status_krs',
+                'k.total_sks',
+                DB::raw('COUNT(kd.id) as total_mk')
+            )
+            ->groupBy('k.id', 'm.nim', 'm.nama', 'p.nama_prodi', 'ta.tahun', 'ta.semester', 'k.status_krs', 'k.total_sks')
+            ->orderByDesc('k.id');
+
+        if ($tahunAkademikId) {
+            $query->where('k.tahun_akademik_id', $tahunAkademikId);
+        }
+
+        $items = $query->paginate(20)->withQueryString();
+
+        return view('akademik.monitoring-krs', [
+            'title' => 'Monitoring KRS',
+            'items' => $items,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+        ]);
+    }
+
+    public function nilaiMahasiswa(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $prodiId = $request->query('prodi_id');
+
+        $query = DB::table('krs_detail as kd')
+            ->join('krs as k', 'k.id', '=', 'kd.krs_id')
+            ->join('mahasiswa as m', 'm.id', '=', 'k.mahasiswa_id')
+            ->join('program_studi as p', 'p.id', '=', 'm.prodi_id')
+            ->join('jadwal as j', 'j.id', '=', 'kd.jadwal_id')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
+            ->join('dosen as d', 'd.id', '=', 'j.dosen_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'k.tahun_akademik_id')
+            ->leftJoin('nilai as n', 'n.krs_detail_id', '=', 'kd.id')
+            ->select(
+                'm.nim',
+                'm.nama as nama_mahasiswa',
+                'p.nama_prodi',
+                'mk.kode_mk',
+                'mk.nama_mk',
+                'd.nama as nama_dosen',
+                'ta.tahun',
+                'ta.semester',
+                'n.nilai_angka',
+                'n.nilai_huruf',
+                'k.status_krs'
+            )
+            ->orderBy('m.nim');
+
+        if ($tahunAkademikId) {
+            $query->where('k.tahun_akademik_id', $tahunAkademikId);
+        }
+        if ($prodiId) {
+            $query->where('m.prodi_id', $prodiId);
+        }
+
+        $items = $query->paginate(25)->withQueryString();
+
+        return view('akademik.nilai-mahasiswa', [
+            'title' => 'Rekap Nilai Mahasiswa',
+            'items' => $items,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'prodiList' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
+            'selectedProdiId' => $prodiId,
+        ]);
+    }
+
+    public function evaluasiDosen(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $dosenId = $request->query('dosen_id');
+
+        $query = DB::table('evaluasi_dosen as ed')
+            ->join('dosen as d', 'd.id', '=', 'ed.dosen_id')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'ed.mata_kuliah_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'ed.tahun_akademik_id')
+            ->whereNotNull('ed.submitted_at')
+            ->select(
+                'ed.id',
+                'ed.dosen_id',
+                'ed.mata_kuliah_id',
+                'ed.tahun_akademik_id',
+                'ed.nilai_1',
+                'ed.nilai_2',
+                'ed.nilai_3',
+                'ed.komentar',
+                'ed.submitted_at',
+                'd.nama as nama_dosen',
+                'mk.kode_mk',
+                'mk.nama_mk',
+                'ta.tahun',
+                'ta.semester'
+            );
+
+        if ($tahunAkademikId) {
+            $query->where('ed.tahun_akademik_id', $tahunAkademikId);
+        }
+        if ($dosenId) {
+            $query->where('ed.dosen_id', $dosenId);
+        }
+
+        $rows = $query
+            ->orderByDesc('ed.submitted_at')
+            ->orderByDesc('ed.id')
+            ->get();
+
+        $summary = $rows
+            ->groupBy(fn ($r) => $r->dosen_id.'-'.$r->mata_kuliah_id.'-'.$r->tahun_akademik_id)
+            ->map(function ($group) {
+                $first = $group->first();
+                $avg1 = round($group->avg('nilai_1'), 2);
+                $avg2 = round($group->avg('nilai_2'), 2);
+                $avg3 = round($group->avg('nilai_3'), 2);
+
+                return (object) [
+                    'nama_dosen' => $first->nama_dosen,
+                    'mata_kuliah' => $first->kode_mk.' - '.$first->nama_mk,
+                    'tahun' => $first->tahun,
+                    'semester' => $first->semester,
+                    'jumlah_responden' => $group->count(),
+                    'rata_rata' => round(($avg1 + $avg2 + $avg3) / 3, 2),
+                    'avg_1' => $avg1,
+                    'avg_2' => $avg2,
+                    'avg_3' => $avg3,
+                ];
+            })
+            ->sortByDesc('rata_rata')
+            ->values();
+
+        return view('akademik.evaluasi-dosen', [
+            'title' => 'Rekap Evaluasi Dosen',
+            'summary' => $summary,
+            'rows' => $rows,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'dosenList' => DB::table('dosen')->orderBy('nama')->get(),
+            'selectedDosenId' => $dosenId,
+        ]);
+    }
 }

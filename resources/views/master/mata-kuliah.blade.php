@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -30,8 +30,8 @@
 
         <article class="card-panel xl:col-span-8">
             <h2 class="text-base font-semibold text-gray-900">Daftar Mata Kuliah</h2>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Kode</th>
@@ -48,31 +48,31 @@
                                 <form action="{{ route('master.mata-kuliah.update', $item->id) }}" method="POST" class="space-y-2">
                                     @csrf
                                     @method('PATCH')
-                                    <input name="kode_mk" value="{{ $item->kode_mk }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-28">
+                                    <input name="kode_mk" value="{{ $item->kode_mk }}" class="input-select w-28">
                             </td>
                             <td class="px-4 py-3">
-                                    <input name="nama_mk" value="{{ $item->nama_mk }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-full">
+                                    <input name="nama_mk" value="{{ $item->nama_mk }}" class="input-select w-full">
                             </td>
                             <td class="px-4 py-3">
                                     <div class="flex items-center gap-2">
-                                        <input name="sks" type="number" min="1" max="6" value="{{ $item->sks }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-16">
-                                        <input name="semester" type="number" min="1" max="14" value="{{ $item->semester }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-20" title="Semester">
+                                        <input name="sks" type="number" min="1" max="6" value="{{ $item->sks }}" class="input-select w-16">
+                                        <input name="semester" type="number" min="1" max="14" value="{{ $item->semester }}" class="input-select w-20" title="Semester">
                                     </div>
                             </td>
                             <td class="px-4 py-3">
-                                    <select name="prodi_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="prodi_id" class="input-select">
                                         @foreach($prodi as $p)
                                             <option value="{{ $p->id }}" @selected($p->id === $item->prodi_id)>{{ $p->nama_prodi }}</option>
                                         @endforeach
                                     </select>
                             </td>
                             <td class="px-4 py-3">
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Edit</button>
+                                    <button class="btn-compact">Edit</button>
                                 </form>
                                 <form action="{{ route('master.mata-kuliah.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete mata kuliah ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="px-3 py-1 text-xs text-white bg-red-500 rounded">Delete</button>
+                                    <button class="btn-compact-danger">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -85,3 +85,6 @@
         </article>
     </section>
 @endsection
+
+
+

@@ -173,6 +173,47 @@ class KeuanganController extends Controller
         ]);
     }
 
+    public function monitoringPembayaran(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $status = $request->query('status');
+
+        $query = DB::table('tagihan_ukt as t')
+            ->join('mahasiswa as m', 'm.id', '=', 't.mahasiswa_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 't.tahun_akademik_id')
+            ->leftJoin('pembayaran as p', 'p.tagihan_id', '=', 't.id')
+            ->select(
+                't.id',
+                'm.nim',
+                'm.nama',
+                'ta.tahun',
+                'ta.semester',
+                't.jumlah',
+                't.status',
+                DB::raw('COALESCE(SUM(p.jumlah_bayar), 0) as total_bayar'),
+                DB::raw('MAX(p.tanggal_bayar) as pembayaran_terakhir')
+            )
+            ->groupBy('t.id', 'm.nim', 'm.nama', 'ta.tahun', 'ta.semester', 't.jumlah', 't.status')
+            ->orderByDesc('t.id');
+
+        if ($tahunAkademikId) {
+            $query->where('t.tahun_akademik_id', $tahunAkademikId);
+        }
+        if ($status) {
+            $query->where('t.status', $status);
+        }
+
+        $items = $query->paginate(20)->withQueryString();
+
+        return view('keuangan.monitoring-pembayaran', [
+            'title' => 'Monitoring Pembayaran',
+            'items' => $items,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'selectedStatus' => $status,
+        ]);
+    }
+
     public function storePembayaran(Request $request)
     {
         $validated = $request->validate([

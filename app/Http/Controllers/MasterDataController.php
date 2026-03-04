@@ -10,6 +10,19 @@ use Illuminate\Validation\Rule;
 
 class MasterDataController extends Controller
 {
+    private const JABATAN_OPTIONS = [
+        'Ketua Prodi',
+        'Sekretaris Prodi',
+        'Kaprodi',
+        'Dekan',
+        'Wakil Dekan',
+        'Koordinator Mata Kuliah',
+        'Dosen Pengampu',
+        'Dosen Pembimbing Akademik',
+        'Rektor',
+        'Wakil Rektor',
+    ];
+
     public function __construct(private readonly ScheduleService $scheduleService)
     {
     }
@@ -489,7 +502,7 @@ class MasterDataController extends Controller
                 ->orderByDesc('jd.id')
                 ->get(),
             'dosen' => DB::table('dosen')->orderBy('nama')->get(),
-            'jabatanOptions' => ['Dosen PA', 'Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor'],
+            'jabatanOptions' => self::JABATAN_OPTIONS,
         ]);
     }
 
@@ -497,14 +510,14 @@ class MasterDataController extends Controller
     {
         $validated = $request->validate([
             'dosen_id' => ['required', 'integer', 'exists:dosen,id'],
-            'jabatan' => ['required', Rule::in(['Dosen PA', 'Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor'])],
+            'jabatan' => ['required', Rule::in(self::JABATAN_OPTIONS)],
             'periode_mulai' => ['required', 'date'],
             'periode_selesai' => ['nullable', 'date', 'after_or_equal:periode_mulai'],
             'status_aktif' => ['nullable', 'boolean'],
         ]);
 
         $isActive = (bool) ($validated['status_aktif'] ?? true);
-        $jabatanStrategis = ['Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor'];
+        $jabatanStrategis = ['Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor', 'Ketua Prodi'];
 
         if ($isActive && in_array($validated['jabatan'], $jabatanStrategis, true)) {
             // Hanya boleh ada satu pejabat aktif per jabatan strategis.
@@ -552,14 +565,14 @@ class MasterDataController extends Controller
 
         $validated = $request->validate([
             'dosen_id' => ['required', 'integer', 'exists:dosen,id'],
-            'jabatan' => ['required', Rule::in(['Dosen PA', 'Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor'])],
+            'jabatan' => ['required', Rule::in(self::JABATAN_OPTIONS)],
             'periode_mulai' => ['required', 'date'],
             'periode_selesai' => ['nullable', 'date', 'after_or_equal:periode_mulai'],
             'status_aktif' => ['nullable', 'boolean'],
         ]);
 
         $isActive = (bool) ($validated['status_aktif'] ?? false);
-        $jabatanStrategis = ['Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor'];
+        $jabatanStrategis = ['Dekan', 'Kaprodi', 'Rektor', 'Wakil Rektor', 'Ketua Prodi'];
         if ($isActive && in_array($validated['jabatan'], $jabatanStrategis, true)) {
             DB::table('jabatan_dosen')
                 ->where('jabatan', $validated['jabatan'])

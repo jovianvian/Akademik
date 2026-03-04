@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -22,8 +22,8 @@
 
         <article class="card-panel xl:col-span-8">
             <h2 class="text-base font-semibold text-gray-900">Daftar Program Studi</h2>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Prodi</th>
@@ -38,22 +38,22 @@
                                 <form action="{{ route('master.prodi.update', $item->id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <input name="nama_prodi" value="{{ $item->nama_prodi }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <input name="nama_prodi" value="{{ $item->nama_prodi }}" class="input-select">
                             </td>
                             <td class="px-4 py-3">
-                                    <select name="fakultas_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="fakultas_id" class="input-select">
                                         @foreach($fakultas as $f)
                                             <option value="{{ $f->id }}" @selected($f->id === $item->fakultas_id)>{{ $f->nama_fakultas }}</option>
                                         @endforeach
                                     </select>
                             </td>
                             <td class="px-4 py-3">
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Edit</button>
+                                    <button class="btn-compact">Edit</button>
                                 </form>
                                 <form action="{{ route('master.prodi.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete prodi ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="px-3 py-1 text-xs text-white bg-red-500 rounded">Delete</button>
+                                    <button class="btn-compact-danger">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -66,3 +66,6 @@
         </article>
     </section>
 @endsection
+
+
+

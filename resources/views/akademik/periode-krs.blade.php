@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -7,8 +7,8 @@
             @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
             @if($errors->any()) <p class="mt-3 text-sm text-error-600">{{ $errors->first() }}</p> @endif
 
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Tahun Akademik</th>
@@ -29,9 +29,9 @@
                                         <input type="checkbox" name="krs_dibuka" value="1" @checked($item->krs_dibuka)>
                                         KRS Dibuka
                                     </label>
-                                    <input type="datetime-local" name="krs_mulai" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $item->krs_mulai ? date('Y-m-d\\TH:i', strtotime($item->krs_mulai)) : '' }}">
-                                    <input type="datetime-local" name="krs_selesai" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $item->krs_selesai ? date('Y-m-d\\TH:i', strtotime($item->krs_selesai)) : '' }}">
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Simpan</button>
+                                    <input type="datetime-local" name="krs_mulai" class="input-select" value="{{ $item->krs_mulai ? date('Y-m-d\\TH:i', strtotime($item->krs_mulai)) : '' }}">
+                                    <input type="datetime-local" name="krs_selesai" class="input-select" value="{{ $item->krs_selesai ? date('Y-m-d\\TH:i', strtotime($item->krs_selesai)) : '' }}">
+                                    <button class="btn-compact">Simpan</button>
                                 </form>
                             </td>
                         </tr>
@@ -42,3 +42,6 @@
         </article>
     </section>
 @endsection
+
+
+

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -42,8 +42,8 @@
 
         <article class="card-panel xl:col-span-8">
             <h2 class="text-base font-semibold text-gray-900">Data Tagihan Mahasiswa</h2>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Mahasiswa</th>
@@ -64,14 +64,14 @@
                                 <form action="{{ route('keuangan.tagihan.status', $item->id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <select name="status" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="status" class="input-select">
                                         <option value="open" @selected($item->status === 'open')>Open</option>
                                         <option value="partial" @selected($item->status === 'partial')>Partial</option>
                                         <option value="paid" @selected($item->status === 'paid')>Paid</option>
                                         <option value="disputed" @selected($item->status === 'disputed')>Disputed</option>
                                         <option value="void" @selected($item->status === 'void')>Void</option>
                                     </select>
-                                    <button class="px-2 py-1 text-xs text-white rounded bg-brand-500">Update</button>
+                                    <button class="btn-compact">Update</button>
                                 </form>
                             </td>
                         </tr>
@@ -84,3 +84,6 @@
         </article>
     </section>
 @endsection
+
+
+

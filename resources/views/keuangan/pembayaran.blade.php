@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -32,12 +32,12 @@
             <div class="flex items-center justify-between gap-2">
                 <h2 class="text-base font-semibold text-gray-900">Riwayat Pembayaran</h2>
                 <div class="flex items-center gap-2">
-                    <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="px-3 py-1 text-xs text-white rounded bg-brand-500">Export CSV</a>
-                    <a href="{{ route('keuangan.pembayaran.export-pdf', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo]) }}" class="px-3 py-1 text-xs text-white rounded bg-brand-500">Export PDF</a>
+                    <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-compact">Export CSV</a>
+                    <a href="{{ route('keuangan.pembayaran.export-pdf', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo]) }}" class="btn-compact">Export PDF</a>
                 </div>
             </div>
-            <form method="GET" action="{{ route('keuangan.pembayaran.index') }}" class="flex flex-wrap items-center gap-2 mt-3">
-                <select name="tahun_akademik_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+            <form method="GET" action="{{ route('keuangan.pembayaran.index') }}" class="filter-toolbar mt-3">
+                <select name="tahun_akademik_id" class="input-select">
                     <option value="">Semua periode</option>
                     @foreach($tahunAkademikList as $ta)
                         <option value="{{ $ta->id }}" @selected((string) $selectedTahunAkademikId === (string) $ta->id)>
@@ -45,17 +45,17 @@
                         </option>
                     @endforeach
                 </select>
-                <input type="date" name="date_from" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $dateFrom }}">
-                <input type="date" name="date_to" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $dateTo }}">
+                <input type="date" name="date_from" class="input-select" value="{{ $dateFrom }}">
+                <input type="date" name="date_to" class="input-select" value="{{ $dateTo }}">
                 <input type="hidden" name="sort_by" value="{{ $sortBy }}">
                 <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
-                <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Filter</button>
+                <button class="btn-compact">Filter</button>
             </form>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
+            <div class="mt-4 table-wrap">
                 @php
                     $nextDir = $sortDir === 'asc' ? 'desc' : 'asc';
                 @endphp
-                <table class="w-full text-sm">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">
@@ -102,3 +102,6 @@
         </article>
     </section>
 @endsection
+
+
+

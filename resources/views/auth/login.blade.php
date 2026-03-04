@@ -4,6 +4,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login | Sistem Informasi Akademik</title>
+    <script>
+        (function () {
+            try {
+                var mode = localStorage.getItem('theme_mode');
+                if (mode === 'dark') document.documentElement.classList.add('dark');
+            } catch (e) {}
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="grid min-h-screen place-items-center bg-gray-50 p-4">

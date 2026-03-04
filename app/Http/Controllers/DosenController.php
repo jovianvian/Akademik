@@ -112,6 +112,78 @@ class DosenController extends Controller
         ]);
     }
 
+    public function evaluasiSaya(Request $request)
+    {
+        $dosenId = $this->resolveDosenId();
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+
+        $query = DB::table('evaluasi_dosen as ed')
+            ->join('dosen as d', 'd.id', '=', 'ed.dosen_id')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'ed.mata_kuliah_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'ed.tahun_akademik_id')
+            ->join('mahasiswa as m', 'm.id', '=', 'ed.mahasiswa_id')
+            ->select(
+                'ed.id',
+                'ed.dosen_id',
+                'ed.mata_kuliah_id',
+                'ed.tahun_akademik_id',
+                'ed.nilai_1',
+                'ed.nilai_2',
+                'ed.nilai_3',
+                'ed.komentar',
+                'ed.submitted_at',
+                'mk.kode_mk',
+                'mk.nama_mk',
+                'ta.tahun',
+                'ta.semester',
+                'm.nim',
+                'm.nama as nama_mahasiswa',
+                'd.nama as nama_dosen'
+            )
+            ->whereNotNull('ed.submitted_at');
+
+        if ($dosenId) {
+            $query->where('ed.dosen_id', $dosenId);
+        }
+        if ($tahunAkademikId) {
+            $query->where('ed.tahun_akademik_id', $tahunAkademikId);
+        }
+
+        $rows = $query
+            ->orderByDesc('ed.submitted_at')
+            ->orderByDesc('ed.id')
+            ->get();
+
+        $summary = $rows
+            ->groupBy(fn ($r) => $r->mata_kuliah_id.'-'.$r->tahun_akademik_id)
+            ->map(function ($group) {
+                $first = $group->first();
+                $avg1 = round($group->avg('nilai_1'), 2);
+                $avg2 = round($group->avg('nilai_2'), 2);
+                $avg3 = round($group->avg('nilai_3'), 2);
+
+                return (object) [
+                    'mata_kuliah' => $first->kode_mk.' - '.$first->nama_mk,
+                    'tahun' => $first->tahun,
+                    'semester' => $first->semester,
+                    'jumlah_responden' => $group->count(),
+                    'rata_rata' => round(($avg1 + $avg2 + $avg3) / 3, 2),
+                    'avg_1' => $avg1,
+                    'avg_2' => $avg2,
+                    'avg_3' => $avg3,
+                ];
+            })
+            ->values();
+
+        return view('dosen.evaluasi-saya', [
+            'title' => 'Evaluasi Saya',
+            'summary' => $summary,
+            'rows' => $rows,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+        ]);
+    }
+
     public function storeNilai(Request $request)
     {
         $validatedBase = $request->validate([

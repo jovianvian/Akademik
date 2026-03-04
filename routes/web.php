@@ -23,6 +23,7 @@ Route::post('/logout', [AuthController::class, 'logout'])->middleware(['auth', '
 
 Route::middleware(['auth', 'session.login'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::view('/profile', 'profile.index', ['title' => 'Profil Saya'])->name('profile.index');
     Route::get('/krs', [KrsController::class, 'index'])->middleware(['role:mahasiswa,super_admin', 'ability:krs.view'])->name('krs.index');
     Route::post('/krs', [KrsController::class, 'store'])->middleware(['role:mahasiswa,super_admin', 'ability:krs.manage'])->name('krs.store');
     Route::post('/krs/generate-auto', [KrsController::class, 'generateAuto'])->middleware(['role:mahasiswa,super_admin', 'ability:krs.manage'])->name('krs.generate-auto');
@@ -30,6 +31,8 @@ Route::middleware(['auth', 'session.login'])->group(function () {
     Route::get('/khs', [MahasiswaController::class, 'khs'])->middleware(['role:mahasiswa,super_admin', 'ability:nilai.view'])->name('khs.index');
     Route::get('/khs/export', [MahasiswaController::class, 'exportKhsCsv'])->middleware(['role:mahasiswa,super_admin', 'ability:nilai.view'])->name('khs.export');
     Route::get('/khs/export-pdf', [MahasiswaController::class, 'exportKhsPdf'])->middleware(['role:mahasiswa,super_admin', 'ability:nilai.view'])->name('khs.export-pdf');
+    Route::get('/transkrip', [MahasiswaController::class, 'transkrip'])->middleware(['role:mahasiswa,super_admin', 'ability:nilai.view'])->name('transkrip.index');
+    Route::get('/nilai/{krsDetailId}', [MahasiswaController::class, 'detailNilai'])->middleware(['role:mahasiswa,super_admin', 'ability:nilai.view'])->name('nilai.detail');
     Route::get('/ukt', [MahasiswaController::class, 'ukt'])->middleware(['role:mahasiswa,super_admin', 'ability:ukt.view'])->name('ukt.index');
     Route::get('/jadwal-mahasiswa', [MahasiswaController::class, 'jadwal'])->middleware(['role:mahasiswa,super_admin', 'ability:krs.view'])->name('mahasiswa.jadwal.index');
     Route::get('/profil-mahasiswa', [MahasiswaController::class, 'profil'])->middleware(['role:mahasiswa,super_admin', 'ability:dashboard.view'])->name('mahasiswa.profil.index');
@@ -70,6 +73,7 @@ Route::middleware(['auth', 'session.login'])->group(function () {
 
         Route::get('/pembayaran', [KeuanganController::class, 'pembayaran'])->middleware('ability:keuangan.view')->name('pembayaran.index');
         Route::post('/pembayaran', [KeuanganController::class, 'storePembayaran'])->middleware('ability:keuangan.manage')->name('pembayaran.store');
+        Route::get('/monitoring-pembayaran', [KeuanganController::class, 'monitoringPembayaran'])->middleware('ability:keuangan.view')->name('monitoring-pembayaran.index');
         Route::get('/pembayaran/export', [KeuanganController::class, 'exportPembayaranCsv'])->middleware('ability:keuangan.view')->name('pembayaran.export');
         Route::get('/pembayaran/export-pdf', [KeuanganController::class, 'exportPembayaranPdf'])->middleware('ability:keuangan.view')->name('pembayaran.export-pdf');
     });
@@ -80,6 +84,7 @@ Route::middleware(['auth', 'session.login'])->group(function () {
         Route::post('/nilai', [DosenController::class, 'storeNilai'])->middleware('ability:nilai.manage')->name('nilai.store');
         Route::get('/nilai/export', [DosenController::class, 'exportNilaiCsv'])->middleware('ability:nilai.manage')->name('nilai.export');
         Route::get('/monitoring-mahasiswa', [DosenController::class, 'monitoringMahasiswa'])->middleware('ability:mahasiswa.monitor')->name('monitoring-mahasiswa.index');
+        Route::get('/evaluasi-saya', [DosenController::class, 'evaluasiSaya'])->middleware('ability:mahasiswa.monitor')->name('evaluasi-saya.index');
     });
 
     Route::prefix('akademik')->name('akademik.')->middleware('role:admin_akademik,super_admin')->group(function () {
@@ -91,6 +96,9 @@ Route::middleware(['auth', 'session.login'])->group(function () {
         Route::get('/mahasiswa-status', [AdminAkademikController::class, 'mahasiswaStatus'])->middleware('ability:master.view')->name('mahasiswa-status.index');
         Route::patch('/mahasiswa-status/{id}', [AdminAkademikController::class, 'updateMahasiswaStatus'])->middleware('ability:master.manage')->name('mahasiswa-status.update');
         Route::post('/mahasiswa-status/sync-ukt', [AdminAkademikController::class, 'syncStatusByUkt'])->middleware('ability:master.manage')->name('mahasiswa-status.sync-ukt');
+        Route::get('/monitoring-krs', [AdminAkademikController::class, 'monitoringKrs'])->middleware('ability:master.view')->name('monitoring-krs.index');
+        Route::get('/nilai-mahasiswa', [AdminAkademikController::class, 'nilaiMahasiswa'])->middleware('ability:master.view')->name('nilai-mahasiswa.index');
+        Route::get('/evaluasi-dosen', [AdminAkademikController::class, 'evaluasiDosen'])->middleware('ability:master.view')->name('evaluasi-dosen.index');
     });
 
     Route::prefix('super-admin')->name('super-admin.')->middleware('role:super_admin')->group(function () {

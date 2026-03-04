@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -43,8 +43,8 @@
 
         <article class="card-panel xl:col-span-8">
             <h2 class="text-base font-semibold text-gray-900">Daftar Jadwal</h2>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">MK</th>
@@ -62,14 +62,14 @@
                                 <form action="{{ route('master.jadwal.update', $item->id) }}" method="POST" class="space-y-2">
                                     @csrf
                                     @method('PATCH')
-                                    <select name="mata_kuliah_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="mata_kuliah_id" class="input-select">
                                         @foreach($mataKuliah as $mk)
                                             <option value="{{ $mk->id }}" @selected($mk->id === $item->mata_kuliah_id)>{{ $mk->kode_mk }} - {{ $mk->nama_mk }}</option>
                                         @endforeach
                                     </select>
                             </td>
                             <td class="px-4 py-3">
-                                    <select name="dosen_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="dosen_id" class="input-select">
                                         @foreach($dosen as $d)
                                             <option value="{{ $d->id }}" @selected($d->id === $item->dosen_id)>{{ $d->nama }}</option>
                                         @endforeach
@@ -77,32 +77,32 @@
                             </td>
                             <td class="px-4 py-3">
                                     <div class="flex items-center gap-2">
-                                        <select name="hari" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                        <select name="hari" class="input-select">
                                             @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $hari)
                                                 <option value="{{ $hari }}" @selected($hari === $item->hari)>{{ $hari }}</option>
                                             @endforeach
                                         </select>
-                                        <input name="jam_mulai" type="time" value="{{ substr($item->jam_mulai,0,5) }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
-                                        <input name="jam_selesai" type="time" value="{{ substr($item->jam_selesai,0,5) }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                        <input name="jam_mulai" type="time" value="{{ substr($item->jam_mulai,0,5) }}" class="input-select">
+                                        <input name="jam_selesai" type="time" value="{{ substr($item->jam_selesai,0,5) }}" class="input-select">
                                     </div>
                             </td>
                             <td class="px-4 py-3">
-                                    <input name="ruangan" value="{{ $item->ruangan }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg w-24">
+                                    <input name="ruangan" value="{{ $item->ruangan }}" class="input-select w-24">
                             </td>
                             <td class="px-4 py-3">
-                                    <select name="tahun_akademik_id" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                                    <select name="tahun_akademik_id" class="input-select">
                                         @foreach($tahunAkademik as $ta)
                                             <option value="{{ $ta->id }}" @selected($ta->id === $item->tahun_akademik_id)>{{ $ta->tahun }} {{ ucfirst($ta->semester) }}</option>
                                         @endforeach
                                     </select>
                             </td>
                             <td class="px-4 py-3">
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Edit</button>
+                                    <button class="btn-compact">Edit</button>
                                 </form>
                                 <form action="{{ route('master.jadwal.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete jadwal ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="px-3 py-1 text-xs text-white bg-red-500 rounded">Delete</button>
+                                    <button class="btn-compact-danger">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -115,3 +115,6 @@
         </article>
     </section>
 @endsection
+
+
+

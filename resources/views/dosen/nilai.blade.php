@@ -1,17 +1,17 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
         <article class="card-panel col-span-12">
             <div class="flex items-center justify-between gap-2">
                 <h2 class="text-base font-semibold text-gray-900">Input Nilai Mahasiswa</h2>
-                <a href="{{ route('dosen.nilai.export') }}" class="px-3 py-1 text-xs text-white rounded bg-brand-500">Export CSV</a>
+                <a href="{{ route('dosen.nilai.export') }}" class="btn-compact">Export CSV</a>
             </div>
             @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
             @if($errors->any()) <p class="mt-3 text-sm text-error-600">{{ $errors->first() }}</p> @endif
 
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="mt-4 table-wrap">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Mahasiswa</th>
@@ -83,7 +83,7 @@
                                         placeholder="Kehadiran"
                                         @disabled($item->nilai_terkunci)
                                     >
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500 disabled:opacity-50" @disabled($item->nilai_terkunci)>Simpan</button>
+                                    <button class="btn-compact disabled:opacity-50" @disabled($item->nilai_terkunci)>Simpan</button>
                                 </form>
                             </td>
                         </tr>
@@ -96,3 +96,5 @@
         </article>
     </section>
 @endsection
+
+

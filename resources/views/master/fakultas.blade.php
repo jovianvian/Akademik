@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -15,12 +15,15 @@
 
         <article class="card-panel xl:col-span-8">
             <h2 class="text-base font-semibold text-gray-900">Daftar Fakultas</h2>
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
-                <table class="w-full text-sm">
+            <div class="filter-toolbar mt-3">
+                <input type="text" class="input-select w-full md:w-72" placeholder="Cari fakultas..." data-live-search-target="#fakultasTable">
+            </div>
+            <div class="mt-4 table-wrap">
+                <table class="table-base" id="fakultasTable">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left">Nama Fakultas</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
+                        <th class="px-4 py-3">Nama Fakultas</th>
+                        <th class="px-4 py-3">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -30,15 +33,15 @@
                                 <form action="{{ route('master.fakultas.update', $item->id) }}" method="POST" class="flex items-center gap-2">
                                     @csrf
                                     @method('PATCH')
-                                    <input name="nama_fakultas" value="{{ $item->nama_fakultas }}" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
-                                    <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Edit</button>
+                                    <input name="nama_fakultas" value="{{ $item->nama_fakultas }}" class="input-select">
+                                    <button class="btn-compact">Edit</button>
                                 </form>
                             </td>
                             <td class="px-4 py-3">
                                 <form action="{{ route('master.fakultas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin soft delete fakultas ini?')">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="px-3 py-1 text-xs text-white bg-red-500 rounded">Delete</button>
+                                    <button class="btn-compact-danger">Delete</button>
                                 </form>
                             </td>
                         </tr>
@@ -51,3 +54,6 @@
         </article>
     </section>
 @endsection
+
+
+

@@ -1,4 +1,4 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -7,29 +7,29 @@
                 <h2 class="text-base font-semibold text-gray-900">Audit Log Sistem</h2>
                 <div class="flex items-center gap-2">
                     <form method="GET" action="{{ route('super-admin.audit-logs.index') }}" class="flex flex-wrap items-center gap-2">
-                        <select name="modul" class="h-9 px-2 text-xs border border-gray-200 rounded-lg">
+                        <select name="modul" class="input-select">
                             <option value="">Semua modul</option>
                             @foreach($modulList as $modul)
                                 <option value="{{ $modul }}" @selected($selectedModul === $modul)>{{ $modul }}</option>
                             @endforeach
                         </select>
-                        <input type="date" name="date_from" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $dateFrom }}">
-                        <input type="date" name="date_to" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $dateTo }}">
-                        <input type="text" name="q" class="h-9 px-2 text-xs border border-gray-200 rounded-lg" value="{{ $q }}" placeholder="Cari aksi/user">
+                        <input type="date" name="date_from" class="input-select" value="{{ $dateFrom }}">
+                        <input type="date" name="date_to" class="input-select" value="{{ $dateTo }}">
+                        <input type="text" name="q" class="input-select" value="{{ $q }}" placeholder="Cari aksi/user">
                         <input type="hidden" name="sort_by" value="{{ $sortBy }}">
                         <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
-                        <button class="px-3 py-1 text-xs text-white rounded bg-brand-500">Filter</button>
+                        <button class="btn-compact">Filter</button>
                     </form>
-                    <a href="{{ route('super-admin.audit-logs.export', ['modul' => $selectedModul, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'q' => $q, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="px-3 py-1 text-xs text-white rounded bg-brand-500">Export CSV</a>
-                    <a href="{{ route('super-admin.audit-logs.export-pdf', ['modul' => $selectedModul, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'q' => $q, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="px-3 py-1 text-xs text-white rounded bg-brand-500">Export PDF</a>
+                    <a href="{{ route('super-admin.audit-logs.export', ['modul' => $selectedModul, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'q' => $q, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-compact">Export CSV</a>
+                    <a href="{{ route('super-admin.audit-logs.export-pdf', ['modul' => $selectedModul, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'q' => $q, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-compact">Export PDF</a>
                 </div>
             </div>
 
-            <div class="mt-4 overflow-hidden border border-gray-200 rounded-xl">
+            <div class="mt-4 table-wrap">
                 @php
                     $nextDir = $sortDir === 'asc' ? 'desc' : 'asc';
                 @endphp
-                <table class="w-full text-sm">
+                <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left"><a href="{{ route('super-admin.audit-logs.index', array_merge(request()->query(), ['sort_by' => 'created_at', 'sort_dir' => $nextDir])) }}">Waktu</a></th>
@@ -60,3 +60,6 @@
         </article>
     </section>
 @endsection
+
+
+

@@ -76,6 +76,97 @@ class MahasiswaController extends Controller
         ]);
     }
 
+    public function transkrip()
+    {
+        $mahasiswa = $this->resolveMahasiswa();
+        if (! $mahasiswa) {
+            return back()->withErrors(['transkrip' => 'Data mahasiswa tidak ditemukan.']);
+        }
+
+        $rows = DB::table('krs as k')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'k.tahun_akademik_id')
+            ->join('krs_detail as kd', 'kd.krs_id', '=', 'k.id')
+            ->join('jadwal as j', 'j.id', '=', 'kd.jadwal_id')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
+            ->leftJoin('nilai as n', 'n.krs_detail_id', '=', 'kd.id')
+            ->where('k.mahasiswa_id', $mahasiswa->id)
+            ->where('k.status_krs', 'final')
+            ->select(
+                'kd.id as krs_detail_id',
+                'ta.tahun',
+                'ta.semester',
+                'mk.kode_mk',
+                'mk.nama_mk',
+                'mk.sks',
+                'n.nilai_angka',
+                'n.nilai_huruf',
+                'k.tahun_akademik_id'
+            )
+            ->orderBy('ta.tahun')
+            ->orderBy('ta.semester')
+            ->orderBy('mk.kode_mk')
+            ->get();
+
+        $totalSks = (int) $rows->sum('sks');
+        $totalBobot = 0.0;
+        foreach ($rows as $row) {
+            $totalBobot += ((int) $row->sks) * AcademicRuleSnapshotService::gradePoint((string) $row->nilai_huruf, (int) $row->tahun_akademik_id);
+        }
+        $ipk = $totalSks > 0 ? round($totalBobot / $totalSks, 2) : 0.0;
+
+        return view('mahasiswa.transkrip', [
+            'title' => 'Transkrip Akademik',
+            'mahasiswa' => $mahasiswa,
+            'rows' => $rows,
+            'totalSks' => $totalSks,
+            'ipk' => $ipk,
+        ]);
+    }
+
+    public function detailNilai(int $krsDetailId)
+    {
+        $mahasiswa = $this->resolveMahasiswa();
+        if (! $mahasiswa) {
+            return back()->withErrors(['nilai' => 'Data mahasiswa tidak ditemukan.']);
+        }
+
+        $row = DB::table('krs_detail as kd')
+            ->join('krs as k', 'k.id', '=', 'kd.krs_id')
+            ->join('jadwal as j', 'j.id', '=', 'kd.jadwal_id')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
+            ->join('dosen as d', 'd.id', '=', 'j.dosen_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'k.tahun_akademik_id')
+            ->leftJoin('nilai as n', 'n.krs_detail_id', '=', 'kd.id')
+            ->where('kd.id', $krsDetailId)
+            ->where('k.mahasiswa_id', $mahasiswa->id)
+            ->select(
+                'kd.id as krs_detail_id',
+                'mk.kode_mk',
+                'mk.nama_mk',
+                'mk.sks',
+                'd.nama as nama_dosen',
+                'ta.tahun',
+                'ta.semester',
+                'n.nilai_tugas',
+                'n.nilai_uts',
+                'n.nilai_uas',
+                'n.nilai_kehadiran',
+                'n.nilai_angka',
+                'n.nilai_huruf'
+            )
+            ->first();
+
+        if (! $row) {
+            return back()->withErrors(['nilai' => 'Detail nilai tidak ditemukan.']);
+        }
+
+        return view('mahasiswa.detail-nilai', [
+            'title' => 'Detail Nilai Mata Kuliah',
+            'mahasiswa' => $mahasiswa,
+            'item' => $row,
+        ]);
+    }
+
     public function exportKhsCsv(Request $request)
     {
         $mahasiswa = $this->resolveMahasiswa();
@@ -221,10 +312,18 @@ class MahasiswaController extends Controller
                 ->where('k.mahasiswa_id', $mahasiswa->id)
                 ->select(
                     'kd.id as krs_detail_id',
+                    'k.tahun_akademik_id',
+                    'j.dosen_id',
+                    'j.mata_kuliah_id',
                     'mk.kode_mk',
                     'mk.nama_mk',
                     'd.nama as nama_dosen',
-                    DB::raw('COALESCE(ed.status_selesai, 0) as status_selesai')
+                    'ed.id as evaluasi_id',
+                    'ed.nilai_1',
+                    'ed.nilai_2',
+                    'ed.nilai_3',
+                    'ed.komentar',
+                    'ed.submitted_at'
                 )
                 ->orderByDesc('kd.id')
                 ->get();
@@ -252,29 +351,43 @@ class MahasiswaController extends Controller
 
         $validated = $request->validate([
             'krs_detail_id' => ['required', 'integer', 'exists:krs_detail,id'],
-            'status_selesai' => ['required', 'in:0,1'],
+            'nilai_1' => ['required', 'integer', 'between:1,5'],
+            'nilai_2' => ['required', 'integer', 'between:1,5'],
+            'nilai_3' => ['required', 'integer', 'between:1,5'],
+            'komentar' => ['nullable', 'max:1000'],
         ]);
 
-        $owned = DB::table('krs_detail as kd')
+        $context = DB::table('krs_detail as kd')
             ->join('krs as k', 'k.id', '=', 'kd.krs_id')
+            ->join('jadwal as j', 'j.id', '=', 'kd.jadwal_id')
             ->where('kd.id', $validated['krs_detail_id'])
             ->where('k.mahasiswa_id', $mahasiswa->id)
-            ->exists();
+            ->select('k.tahun_akademik_id', 'j.dosen_id', 'j.mata_kuliah_id')
+            ->first();
 
-        if (! $owned) {
+        if (! $context) {
             return back()->withErrors(['evaluasi' => 'Anda tidak berhak mengubah evaluasi ini.']);
         }
 
         DB::table('evaluasi_dosen')->updateOrInsert(
             ['krs_detail_id' => $validated['krs_detail_id']],
             [
-                'status_selesai' => $validated['status_selesai'] === '1',
+                'mahasiswa_id' => $mahasiswa->id,
+                'dosen_id' => $context->dosen_id,
+                'mata_kuliah_id' => $context->mata_kuliah_id,
+                'tahun_akademik_id' => $context->tahun_akademik_id,
+                'status_selesai' => true,
+                'nilai_1' => (int) $validated['nilai_1'],
+                'nilai_2' => (int) $validated['nilai_2'],
+                'nilai_3' => (int) $validated['nilai_3'],
+                'komentar' => $validated['komentar'] ?? null,
+                'submitted_at' => now(),
                 'updated_at' => now(),
                 'created_at' => now(),
             ]
         );
 
-        return back()->with('success', 'Status evaluasi dosen berhasil diperbarui.');
+        return back()->with('success', 'Evaluasi dosen berhasil disimpan.');
     }
 
     private function resolveMahasiswa()
@@ -307,6 +420,7 @@ class MahasiswaController extends Controller
             ->select(
                 'k.id as krs_id',
                 'k.tahun_akademik_id',
+                'kd.id as krs_detail_id',
                 'ta.tahun',
                 'ta.semester',
                 'k.status_krs',
