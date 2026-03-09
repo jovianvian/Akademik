@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -20,12 +20,12 @@
                 <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left">Mahasiswa</th>
-                        <th class="px-4 py-3 text-left">Prodi</th>
-                        <th class="px-4 py-3 text-left">Status UKT Aktif</th>
-                        <th class="px-4 py-3 text-left">Eligibility Periode</th>
-                        <th class="px-4 py-3 text-left">Catatan</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
+                        <th class="px-4 py-3 text-left" style="width: 20%;">Mahasiswa</th>
+                        <th class="px-4 py-3 text-left" style="width: 14%;">Prodi</th>
+                        <th class="px-4 py-3 text-left" style="width: 18%;">Status UKT Aktif</th>
+                        <th class="px-4 py-3 text-left" style="width: 18%;">Eligibility Periode</th>
+                        <th class="px-4 py-3 text-left" style="width: 15%;">Catatan</th>
+                        <th class="px-4 py-3 text-left table-action-col" style="width: 15%;">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -47,7 +47,7 @@
                             <td class="px-4 py-3">
                                     <input type="text" name="catatan_status" value="{{ $item->eligibility_reason ?? $item->catatan_status }}" class="input-select w-64">
                             </td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 table-action-col">
                                     <button class="btn-compact">Update</button>
                                 </form>
                             </td>
@@ -56,6 +56,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $items->links() }}</div>
         </article>
 
         <article class="card-panel col-span-12">
@@ -88,6 +89,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $statusLogs->links() }}</div>
         </article>
     </section>
 @endsection

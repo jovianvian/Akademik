@@ -44,7 +44,7 @@ class SuperAdminController extends Controller
 
         return view('super-admin.users', [
             'title' => 'Kelola User',
-            'items' => $query->orderBy($sortColumn, $sortDir)->orderBy('u.id')->paginate(15)->withQueryString(),
+            'items' => $query->orderBy($sortColumn, $sortDir)->orderBy('u.id')->paginate(10)->withQueryString(),
             'roles' => DB::table('roles')->orderBy('role_name')->get(),
             'sortBy' => $sortBy,
             'sortDir' => $sortDir,

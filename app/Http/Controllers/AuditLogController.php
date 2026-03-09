@@ -51,7 +51,7 @@ class AuditLogController extends Controller
             'items' => $query
                 ->orderBy($sortColumn, $sortDir)
                 ->orderByDesc('a.id')
-                ->paginate(25)
+                ->paginate(10)
                 ->withQueryString(),
             'selectedModul' => $modul,
             'dateFrom' => $dateFrom,

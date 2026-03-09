@@ -89,4 +89,31 @@ class User extends Authenticatable
     {
         return in_array($ability, $this->abilities(), true);
     }
+
+    public function activeDosenJabatan(): ?string
+    {
+        if (! $this->hasRole('dosen')) {
+            return null;
+        }
+
+        return DB::table('jabatan_dosen as jd')
+            ->join('dosen as d', 'd.id', '=', 'jd.dosen_id')
+            ->where('d.user_id', $this->id)
+            ->where('jd.status_aktif', true)
+            ->whereNull('jd.deleted_at')
+            ->orderByDesc('jd.id')
+            ->value('jd.jabatan');
+    }
+
+    public function hasDosenJabatan(string ...$jabatan): bool
+    {
+        if (! $this->hasRole('dosen')) {
+            return false;
+        }
+
+        $active = strtolower((string) ($this->activeDosenJabatan() ?? 'Dosen Pengampu'));
+        $allowed = array_map(fn ($item) => strtolower($item), $jabatan);
+
+        return in_array($active, $allowed, true);
+    }
 }

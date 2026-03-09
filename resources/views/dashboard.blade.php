@@ -3,6 +3,12 @@
 @section('content')
     @php
         $evaluasiEnabled = \App\Support\AcademicSetting::evaluasiEnabled();
+        $user = auth()->user();
+        $isDosen = $user?->hasRole('dosen');
+        $canJadwalDosen = ! $isDosen || $user->hasDosenJabatan('Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
+        $canInputNilaiDosen = ! $isDosen || $user->hasDosenJabatan('Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
+        $canMonitorDosen = ! $isDosen || $user->hasDosenJabatan('Rektor', 'Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Dosen Pembimbing Akademik');
+        $canEvaluasiDosen = ! $isDosen || $user->hasDosenJabatan('Rektor', 'Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
     @endphp
     <section class="grid grid-cols-12 items-start gap-4 md:gap-6">
         @foreach($cards as $card)
@@ -79,10 +85,10 @@
                     <a href="{{ route('keuangan.tagihan.index') }}" class="quick-link">Kelola Tagihan UKT</a>
                     <a href="{{ route('keuangan.monitoring-pembayaran.index') }}" class="quick-link">Monitoring Pembayaran</a>
                 @endif
-                @if(auth()->user()->hasAbility('jadwal.view'))
+                @if(auth()->user()->hasAbility('jadwal.view') && $canJadwalDosen)
                     <a href="{{ route('dosen.jadwal.index') }}" class="quick-link">Lihat Jadwal Mengajar</a>
                 @endif
-                @if(auth()->user()->hasAbility('nilai.manage'))
+                @if(auth()->user()->hasAbility('nilai.manage') && $canInputNilaiDosen)
                     <a href="{{ route('dosen.nilai.index') }}" class="quick-link">Input Nilai Mahasiswa</a>
                 @endif
                 @if(auth()->user()->hasAbility('nilai.view'))
@@ -91,8 +97,11 @@
                 @if(auth()->user()->hasAbility('ukt.view'))
                     <a href="{{ route('ukt.index') }}" class="quick-link">Status Pembayaran UKT</a>
                 @endif
-                @if(auth()->user()->hasAbility('mahasiswa.monitor'))
+                @if(auth()->user()->hasAbility('mahasiswa.monitor') && $canMonitorDosen)
                     <a href="{{ route('dosen.monitoring-mahasiswa.index') }}" class="quick-link">Monitoring Mahasiswa</a>
+                @endif
+                @if(auth()->user()->hasAbility('mahasiswa.monitor') && $evaluasiEnabled && $canEvaluasiDosen)
+                    <a href="{{ route('dosen.evaluasi-saya.index') }}" class="quick-link">Evaluasi Saya</a>
                 @endif
                 @if(auth()->user()->hasAbility('krs.manage') && $evaluasiEnabled)
                     <a href="{{ route('mahasiswa.evaluasi.index') }}" class="quick-link">Isi Evaluasi Dosen</a>
@@ -260,6 +269,5 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 @endpush
-
 
 

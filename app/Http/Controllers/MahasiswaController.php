@@ -16,7 +16,7 @@ class MahasiswaController extends Controller
     {
         $mahasiswa = $this->resolveMahasiswa();
         $tahunAktif = DB::table('tahun_akademik')->where('status_aktif', true)->first();
-        $items = collect();
+        $items = DB::table('jadwal')->whereRaw('1 = 0')->paginate(10);
 
         if ($mahasiswa && $tahunAktif) {
             $items = DB::table('krs as k')
@@ -28,7 +28,8 @@ class MahasiswaController extends Controller
                 ->select('mk.kode_mk', 'mk.nama_mk', 'mk.sks', 'j.hari', 'j.jam_mulai', 'j.jam_selesai', 'j.ruangan')
                 ->orderBy('j.hari')
                 ->orderBy('j.jam_mulai')
-                ->get();
+                ->paginate(10)
+                ->withQueryString();
         }
 
         return view('mahasiswa.jadwal', [
@@ -213,7 +214,7 @@ class MahasiswaController extends Controller
     public function ukt()
     {
         $mahasiswa = $this->resolveMahasiswa();
-        $items = collect();
+        $items = DB::table('tagihan_ukt')->whereRaw('1 = 0')->paginate(10);
         $transactions = collect();
 
         if ($mahasiswa) {
@@ -231,12 +232,14 @@ class MahasiswaController extends Controller
                     DB::raw('COALESCE(SUM(p.jumlah_bayar), 0) as total_bayar')
                 )
                 ->orderByDesc('t.id')
-                ->get();
+                ->paginate(10)
+                ->withQueryString();
 
             $transactions = DB::table('pembayaran as p')
                 ->join('tagihan_ukt as t', 't.id', '=', 'p.tagihan_id')
                 ->join('tahun_akademik as ta', 'ta.id', '=', 't.tahun_akademik_id')
                 ->where('t.mahasiswa_id', $mahasiswa->id)
+                ->whereIn('p.tagihan_id', $items->pluck('id')->all())
                 ->select(
                     'p.id',
                     'p.tagihan_id',
@@ -264,8 +267,8 @@ class MahasiswaController extends Controller
     public function profil()
     {
         $mahasiswa = $this->resolveMahasiswa();
-        $statusLogs = collect();
-        $dosenPaAktif = collect();
+        $statusLogs = DB::table('mahasiswa_status_logs')->whereRaw('1 = 0')->paginate(10, ['*'], 'status_logs_page');
+        $dosenPaAktif = DB::table('dosen_pa_mahasiswa')->whereRaw('1 = 0')->paginate(10, ['*'], 'dosen_pa_page');
 
         if ($mahasiswa) {
             $statusLogs = DB::table('mahasiswa_status_logs as l')
@@ -273,8 +276,8 @@ class MahasiswaController extends Controller
                 ->where('l.mahasiswa_id', $mahasiswa->id)
                 ->select('l.*', 'u.name as changed_by_name')
                 ->orderByDesc('l.id')
-                ->limit(30)
-                ->get();
+                ->paginate(10, ['*'], 'status_logs_page')
+                ->withQueryString();
 
             $dosenPaAktif = DB::table('dosen_pa_mahasiswa as dpm')
                 ->join('dosen as d', 'd.id', '=', 'dpm.dosen_id')
@@ -282,7 +285,8 @@ class MahasiswaController extends Controller
                 ->where('dpm.status_aktif', true)
                 ->select('d.nama', 'd.nidn', 'dpm.periode_mulai', 'dpm.periode_selesai')
                 ->orderByDesc('dpm.id')
-                ->get();
+                ->paginate(10, ['*'], 'dosen_pa_page')
+                ->withQueryString();
         }
 
         return view('mahasiswa.profil', [
@@ -300,7 +304,7 @@ class MahasiswaController extends Controller
         }
 
         $mahasiswa = $this->resolveMahasiswa();
-        $items = collect();
+        $items = DB::table('krs_detail')->whereRaw('1 = 0')->paginate(10);
 
         if ($mahasiswa) {
             $items = DB::table('krs_detail as kd')
@@ -326,7 +330,8 @@ class MahasiswaController extends Controller
                     'ed.submitted_at'
                 )
                 ->orderByDesc('kd.id')
-                ->get();
+                ->paginate(10)
+                ->withQueryString();
         }
 
         return view('mahasiswa.evaluasi', [

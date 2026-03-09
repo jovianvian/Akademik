@@ -1,120 +1,144 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    <section class="grid grid-cols-12 gap-4 md:gap-6">
-        <article class="card-panel xl:col-span-4">
-            <h2 class="text-base font-semibold text-gray-900">Tambah Jadwal</h2>
-            <form action="{{ route('master.jadwal.store') }}" method="POST" class="mt-4 space-y-3">
-                @csrf
-                <select name="mata_kuliah_id" class="input-text">
-                    <option value="">Pilih mata kuliah</option>
-                    @foreach($mataKuliah as $mk)
-                        <option value="{{ $mk->id }}">{{ $mk->kode_mk }} - {{ $mk->nama_mk }}</option>
-                    @endforeach
-                </select>
-                <select name="dosen_id" class="input-text">
-                    <option value="">Pilih dosen</option>
-                    @foreach($dosen as $d)
-                        <option value="{{ $d->id }}">{{ $d->nama }}</option>
-                    @endforeach
-                </select>
-                <div class="grid grid-cols-3 gap-3">
-                    <select name="hari" class="input-text col-span-1">
-                        <option value="">Hari</option>
-                        @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $hari)
-                            <option value="{{ $hari }}">{{ $hari }}</option>
-                        @endforeach
-                    </select>
-                    <input name="jam_mulai" type="time" class="input-text col-span-1">
-                    <input name="jam_selesai" type="time" class="input-text col-span-1">
+    <x-admin.page-layout
+        title="Master Jadwal"
+        description="Kelola jadwal perkuliahan aktif."
+        add-label="+ Tambah Jadwal"
+        add-target="jadwalFormModal"
+    >
+        <x-slot:toolbar>
+            <x-admin.toolbar-filter>
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search mata kuliah/dosen/ruang..." data-live-search-target="#jadwalTable">
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
                 </div>
-                <input name="ruangan" class="input-text" placeholder="Ruangan">
-                <select name="tahun_akademik_id" class="input-text">
-                    <option value="">Pilih tahun akademik</option>
-                    @foreach($tahunAkademik as $ta)
-                        <option value="{{ $ta->id }}">{{ $ta->tahun }} - {{ ucfirst($ta->semester) }} {{ $ta->status_aktif ? '(Aktif)' : '' }}</option>
-                    @endforeach
-                </select>
-                @if($errors->any()) <p class="text-sm text-error-600">{{ $errors->first() }}</p> @endif
-                <button class="btn-primary" type="submit">Simpan</button>
-            </form>
-            @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
-        </article>
+            </x-admin.toolbar-filter>
+        </x-slot:toolbar>
 
-        <article class="card-panel xl:col-span-8">
-            <h2 class="text-base font-semibold text-gray-900">Daftar Jadwal</h2>
-            <div class="mt-4 table-wrap">
-                <table class="table-base">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left">MK</th>
-                        <th class="px-4 py-3 text-left">Dosen</th>
-                        <th class="px-4 py-3 text-left">Waktu</th>
-                        <th class="px-4 py-3 text-left">Ruang</th>
-                        <th class="px-4 py-3 text-left">Periode</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                    @forelse($items as $item)
-                        <tr>
-                            <td class="px-4 py-3">
-                                <form action="{{ route('master.jadwal.update', $item->id) }}" method="POST" class="space-y-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="mata_kuliah_id" class="input-select">
-                                        @foreach($mataKuliah as $mk)
-                                            <option value="{{ $mk->id }}" @selected($mk->id === $item->mata_kuliah_id)>{{ $mk->kode_mk }} - {{ $mk->nama_mk }}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <select name="dosen_id" class="input-select">
-                                        @foreach($dosen as $d)
-                                            <option value="{{ $d->id }}" @selected($d->id === $item->dosen_id)>{{ $d->nama }}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <select name="hari" class="input-select">
-                                            @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $hari)
-                                                <option value="{{ $hari }}" @selected($hari === $item->hari)>{{ $hari }}</option>
-                                            @endforeach
-                                        </select>
-                                        <input name="jam_mulai" type="time" value="{{ substr($item->jam_mulai,0,5) }}" class="input-select">
-                                        <input name="jam_selesai" type="time" value="{{ substr($item->jam_selesai,0,5) }}" class="input-select">
-                                    </div>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <input name="ruangan" value="{{ $item->ruangan }}" class="input-select w-24">
-                            </td>
-                            <td class="px-4 py-3">
-                                    <select name="tahun_akademik_id" class="input-select">
-                                        @foreach($tahunAkademik as $ta)
-                                            <option value="{{ $ta->id }}" @selected($ta->id === $item->tahun_akademik_id)>{{ $ta->tahun }} {{ ucfirst($ta->semester) }}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <button class="btn-compact">Edit</button>
-                                </form>
-                                <form action="{{ route('master.jadwal.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete jadwal ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-compact-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="6" class="px-4 py-3 text-gray-500">Belum ada data.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
+        <x-admin.data-table id="jadwalTable">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3" style="width: 23%;">Mata Kuliah</th>
+                <th class="px-4 py-3" style="width: 18%;">Dosen</th>
+                <th class="px-4 py-3" style="width: 20%;">Waktu</th>
+                <th class="px-4 py-3" style="width: 12%;">Ruang</th>
+                <th class="px-4 py-3" style="width: 15%;">Periode</th>
+                <th class="px-4 py-3 table-action-col" style="width: 12%;">Aksi</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            @forelse($items as $item)
+                <tr>
+                    <td class="px-4 py-3">{{ $item->kode_mk }} - {{ $item->nama_mk }}</td>
+                    <td class="px-4 py-3">{{ $item->nama_dosen }}</td>
+                    <td class="px-4 py-3">{{ $item->hari }}, {{ substr($item->jam_mulai,0,5) }} - {{ substr($item->jam_selesai,0,5) }}</td>
+                    <td class="px-4 py-3">{{ $item->ruangan }}</td>
+                    <td class="px-4 py-3">{{ $item->tahun }} {{ ucfirst($item->semester) }}</td>
+                    <td class="px-4 py-3 table-action-col">
+                        <div class="table-actions justify-center">
+                            <button
+                                type="button"
+                                class="action-btn action-btn-edit"
+                                title="Edit"
+                                data-modal-open="jadwalFormModal"
+                                data-form-title="Edit Jadwal"
+                                data-form-action="{{ route('master.jadwal.update', $item->id) }}"
+                                data-form-method="PATCH"
+                                data-form-submit="Simpan Perubahan"
+                                data-form-values='{{ e(json_encode([
+                                    "mata_kuliah_id" => (string) $item->mata_kuliah_id,
+                                    "dosen_id" => (string) $item->dosen_id,
+                                    "hari" => $item->hari,
+                                    "jam_mulai" => substr($item->jam_mulai, 0, 5),
+                                    "jam_selesai" => substr($item->jam_selesai, 0, 5),
+                                    "ruangan" => $item->ruangan,
+                                    "tahun_akademik_id" => (string) $item->tahun_akademik_id
+                                ])) }}'
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <form action="{{ route('master.jadwal.destroy', $item->id) }}" method="POST" data-confirm-delete data-delete-label="jadwal ini">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-btn action-btn-delete" title="Hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-4 py-4 text-gray-500">Belum ada data jadwal.</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </x-admin.data-table>
+        <div class="mt-4">{{ $items->links() }}</div>
+    </x-admin.page-layout>
+
+    <x-admin.resource-form-modal
+        id="jadwalFormModal"
+        title="Tambah Jadwal"
+        action="{{ route('master.jadwal.store') }}"
+        method="POST"
+        submit-label="Simpan"
+        size="max-w-3xl"
+    >
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <select name="mata_kuliah_id" class="input-text" required>
+                <option value="">Pilih mata kuliah</option>
+                @foreach($mataKuliah as $mk)
+                    <option value="{{ $mk->id }}" @selected((string) old('mata_kuliah_id') === (string) $mk->id)>{{ $mk->kode_mk }} - {{ $mk->nama_mk }}</option>
+                @endforeach
+            </select>
+            <select name="dosen_id" class="input-text" required>
+                <option value="">Pilih dosen</option>
+                @foreach($dosen as $d)
+                    <option value="{{ $d->id }}" @selected((string) old('dosen_id') === (string) $d->id)>{{ $d->nama }}</option>
+                @endforeach
+            </select>
+            <select name="hari" class="input-text" required>
+                <option value="">Hari</option>
+                @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $hari)
+                    <option value="{{ $hari }}" @selected(old('hari') === $hari)>{{ $hari }}</option>
+                @endforeach
+            </select>
+            <div class="grid grid-cols-2 gap-3">
+                <input name="jam_mulai" type="time" class="input-text" value="{{ old('jam_mulai') }}" required>
+                <input name="jam_selesai" type="time" class="input-text" value="{{ old('jam_selesai') }}" required>
             </div>
-        </article>
-    </section>
+            <input name="ruangan" class="input-text" placeholder="Ruangan" value="{{ old('ruangan') }}" required>
+            <select name="tahun_akademik_id" class="input-text" required>
+                <option value="">Pilih tahun akademik</option>
+                @foreach($tahunAkademik as $ta)
+                    <option value="{{ $ta->id }}" @selected((string) old('tahun_akademik_id') === (string) $ta->id)>{{ $ta->tahun }} - {{ ucfirst($ta->semester) }}</option>
+                @endforeach
+            </select>
+        </div>
+        @if($errors->has('jadwal')) <p class="text-sm text-error-600">{{ $errors->first('jadwal') }}</p> @endif
+        @error('mata_kuliah_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('dosen_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('hari') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('jam_mulai') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('jam_selesai') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('ruangan') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('tahun_akademik_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+    </x-admin.resource-form-modal>
 @endsection
 
-
-
+@push('scripts')
+    <script>
+        (function () {
+            @if($errors->any() && old('_modal') === 'jadwalFormModal')
+                const modal = document.getElementById('jadwalFormModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('open');
+                }
+            @endif
+        })();
+    </script>
+@endpush

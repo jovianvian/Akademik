@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -32,8 +32,10 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $items->links() }}</div>
         </article>
     </section>
 @endsection
+
 
 

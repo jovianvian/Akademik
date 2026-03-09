@@ -1,90 +1,122 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    <section class="grid grid-cols-12 gap-4 md:gap-6">
-        <article class="card-panel xl:col-span-4">
-            <h2 class="text-base font-semibold text-gray-900">Tambah Mata Kuliah</h2>
-            <form action="{{ route('master.mata-kuliah.store') }}" method="POST" class="mt-4 space-y-3">
-                @csrf
-                <input name="kode_mk" class="input-text" placeholder="Kode MK">
-                <input name="nama_mk" class="input-text" placeholder="Nama MK">
-                <div class="grid grid-cols-2 gap-3">
-                    <input name="sks" class="input-text" type="number" min="1" max="6" placeholder="SKS">
-                    <input name="semester" class="input-text" type="number" min="1" max="14" placeholder="Semester">
+    <x-admin.page-layout
+        title="Master Mata Kuliah"
+        description="Kelola katalog mata kuliah setiap program studi."
+        add-label="+ Tambah Mata Kuliah"
+        add-target="mataKuliahFormModal"
+    >
+        <x-slot:toolbar>
+            <x-admin.toolbar-filter>
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search kode/nama/prodi..." data-live-search-target="#mataKuliahTable">
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
                 </div>
-                <select name="prodi_id" class="input-text">
+            </x-admin.toolbar-filter>
+        </x-slot:toolbar>
+
+        <x-admin.data-table id="mataKuliahTable">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3" style="width: 13%;">Kode</th>
+                <th class="px-4 py-3" style="width: 25%;">Mata Kuliah</th>
+                <th class="px-4 py-3" style="width: 12%;">SKS</th>
+                <th class="px-4 py-3" style="width: 12%;">Semester</th>
+                <th class="px-4 py-3" style="width: 23%;">Prodi</th>
+                <th class="px-4 py-3 table-action-col" style="width: 15%;">Aksi</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            @forelse($items as $item)
+                <tr>
+                    <td class="px-4 py-3 font-medium">{{ $item->kode_mk }}</td>
+                    <td class="px-4 py-3">{{ $item->nama_mk }}</td>
+                    <td class="px-4 py-3">{{ $item->sks }}</td>
+                    <td class="px-4 py-3">{{ $item->semester }}</td>
+                    <td class="px-4 py-3">{{ $item->nama_prodi }}</td>
+                    <td class="px-4 py-3 table-action-col">
+                        <div class="table-actions justify-center">
+                            <button
+                                type="button"
+                                class="action-btn action-btn-edit"
+                                title="Edit"
+                                data-modal-open="mataKuliahFormModal"
+                                data-form-title="Edit Mata Kuliah"
+                                data-form-action="{{ route('master.mata-kuliah.update', $item->id) }}"
+                                data-form-method="PATCH"
+                                data-form-submit="Simpan Perubahan"
+                                data-form-values='{{ e(json_encode([
+                                    "kode_mk" => $item->kode_mk,
+                                    "nama_mk" => $item->nama_mk,
+                                    "sks" => (string) $item->sks,
+                                    "semester" => (string) $item->semester,
+                                    "prodi_id" => (string) $item->prodi_id
+                                ])) }}'
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <form action="{{ route('master.mata-kuliah.destroy', $item->id) }}" method="POST" data-confirm-delete data-delete-label="mata kuliah ini">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-btn action-btn-delete" title="Hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="px-4 py-4 text-gray-500">Belum ada data mata kuliah.</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </x-admin.data-table>
+        <div class="mt-4">{{ $items->links() }}</div>
+    </x-admin.page-layout>
+
+    <x-admin.resource-form-modal
+        id="mataKuliahFormModal"
+        title="Tambah Mata Kuliah"
+        action="{{ route('master.mata-kuliah.store') }}"
+        method="POST"
+        submit-label="Simpan"
+        size="max-w-2xl"
+    >
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <input name="kode_mk" class="input-text" placeholder="Kode MK" value="{{ old('kode_mk') }}" required>
+            <input name="nama_mk" class="input-text" placeholder="Nama MK" value="{{ old('nama_mk') }}" required>
+            <input name="sks" class="input-text" type="number" min="1" max="6" placeholder="SKS" value="{{ old('sks') }}" required>
+            <input name="semester" class="input-text" type="number" min="1" max="14" placeholder="Semester" value="{{ old('semester') }}" required>
+            <div class="md:col-span-2">
+                <select name="prodi_id" class="input-text w-full" required>
                     <option value="">Pilih prodi</option>
                     @foreach($prodi as $p)
-                        <option value="{{ $p->id }}">{{ $p->nama_prodi }}</option>
+                        <option value="{{ $p->id }}" @selected((string) old('prodi_id') === (string) $p->id)>{{ $p->nama_prodi }}</option>
                     @endforeach
                 </select>
-                @error('kode_mk') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                @error('nama_mk') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                @error('sks') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                @error('semester') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                @error('prodi_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                <button class="btn-primary" type="submit">Simpan</button>
-            </form>
-            @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
-        </article>
-
-        <article class="card-panel xl:col-span-8">
-            <h2 class="text-base font-semibold text-gray-900">Daftar Mata Kuliah</h2>
-            <div class="mt-4 table-wrap">
-                <table class="table-base">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left">Kode</th>
-                        <th class="px-4 py-3 text-left">Mata Kuliah</th>
-                        <th class="px-4 py-3 text-left">SKS</th>
-                        <th class="px-4 py-3 text-left">Prodi</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                    @forelse($items as $item)
-                        <tr>
-                            <td class="px-4 py-3">
-                                <form action="{{ route('master.mata-kuliah.update', $item->id) }}" method="POST" class="space-y-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input name="kode_mk" value="{{ $item->kode_mk }}" class="input-select w-28">
-                            </td>
-                            <td class="px-4 py-3">
-                                    <input name="nama_mk" value="{{ $item->nama_mk }}" class="input-select w-full">
-                            </td>
-                            <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <input name="sks" type="number" min="1" max="6" value="{{ $item->sks }}" class="input-select w-16">
-                                        <input name="semester" type="number" min="1" max="14" value="{{ $item->semester }}" class="input-select w-20" title="Semester">
-                                    </div>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <select name="prodi_id" class="input-select">
-                                        @foreach($prodi as $p)
-                                            <option value="{{ $p->id }}" @selected($p->id === $item->prodi_id)>{{ $p->nama_prodi }}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <button class="btn-compact">Edit</button>
-                                </form>
-                                <form action="{{ route('master.mata-kuliah.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete mata kuliah ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-compact-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="5" class="px-4 py-3 text-gray-500">Belum ada data.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
             </div>
-        </article>
-    </section>
+        </div>
+        @error('kode_mk') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('nama_mk') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('sks') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('semester') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('prodi_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+    </x-admin.resource-form-modal>
 @endsection
 
-
-
+@push('scripts')
+    <script>
+        (function () {
+            @if($errors->any() && old('_modal') === 'mataKuliahFormModal')
+                const modal = document.getElementById('mataKuliahFormModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('open');
+                }
+            @endif
+        })();
+    </script>
+@endpush

@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
             'session.login' => \App\Http\Middleware\EnsureSessionLogin::class,
             'ability' => \App\Http\Middleware\AbilityMiddleware::class,
+            'dosen_jabatan' => \App\Http\Middleware\DosenJabatanMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

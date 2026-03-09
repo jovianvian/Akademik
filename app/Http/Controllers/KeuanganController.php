@@ -14,7 +14,7 @@ class KeuanganController extends Controller
 {
     public function tagihan()
     {
-        $tagihan = DB::table('tagihan_ukt as t')
+        $tagihanQuery = DB::table('tagihan_ukt as t')
             ->join('mahasiswa as m', 'm.id', '=', 't.mahasiswa_id')
             ->join('tahun_akademik as ta', 'ta.id', '=', 't.tahun_akademik_id')
             ->leftJoin('pembayaran as p', 'p.tagihan_id', '=', 't.id')
@@ -29,15 +29,21 @@ class KeuanganController extends Controller
                 DB::raw('COALESCE(SUM(p.jumlah_bayar), 0) as total_bayar')
             )
             ->groupBy('t.id', 'm.nim', 'm.nama', 'ta.tahun', 'ta.semester', 't.jumlah', 't.status')
-            ->orderByDesc('t.id')
-            ->get();
+            ->orderByDesc('t.id');
+
+        $tagihan = $tagihanQuery->paginate(10)->withQueryString();
+
+        $statusCounts = DB::table('tagihan_ukt')
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status');
 
         $monitoring = [
-            'open' => $tagihan->where('status', 'open')->count(),
-            'partial' => $tagihan->where('status', 'partial')->count(),
-            'paid' => $tagihan->where('status', 'paid')->count(),
-            'disputed' => $tagihan->where('status', 'disputed')->count(),
-            'void' => $tagihan->where('status', 'void')->count(),
+            'open' => (int) ($statusCounts['open'] ?? 0),
+            'partial' => (int) ($statusCounts['partial'] ?? 0),
+            'paid' => (int) ($statusCounts['paid'] ?? 0),
+            'disputed' => (int) ($statusCounts['disputed'] ?? 0),
+            'void' => (int) ($statusCounts['void'] ?? 0),
         ];
 
         return view('keuangan.tagihan', [
@@ -93,8 +99,12 @@ class KeuanganController extends Controller
     public function updateStatusTagihan(Request $request, int $id)
     {
         $validated = $request->validate([
-            'status' => ['required', 'in:open,partial,paid,disputed,void'],
+            'status' => ['required', 'in:open,disputed,void'],
         ]);
+
+        if (in_array($validated['status'], ['paid', 'partial'], true)) {
+            return back()->withErrors(['status' => 'Status lunas/sebagian dibayar dihitung otomatis dari transaksi pembayaran.']);
+        }
 
         $before = DB::table('tagihan_ukt')->where('id', $id)->value('status');
         DB::table('tagihan_ukt')->where('id', $id)->update([
@@ -149,7 +159,7 @@ class KeuanganController extends Controller
         $pembayaran = $query
             ->orderBy($sortColumn, $sortDir)
             ->orderByDesc('p.id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         $tagihanMenunggu = DB::table('tagihan_ukt as t')
@@ -203,7 +213,7 @@ class KeuanganController extends Controller
             $query->where('t.status', $status);
         }
 
-        $items = $query->paginate(20)->withQueryString();
+        $items = $query->paginate(10)->withQueryString();
 
         return view('keuangan.monitoring-pembayaran', [
             'title' => 'Monitoring Pembayaran',

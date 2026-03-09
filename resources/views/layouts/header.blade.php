@@ -13,6 +13,25 @@
         </div>
 
         <div class="flex items-center gap-2 sm:gap-3">
+            <button
+                type="button"
+                data-theme-toggle
+                class="inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700 shadow-lg transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800"
+                aria-label="Ubah tema"
+            >
+                <span data-theme-icon-sun class="hidden">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <circle cx="10" cy="10" r="3.5" stroke="currentColor" stroke-width="1.5"></circle>
+                        <path d="M10 2.5v2M10 15.5v2M4.7 4.7l1.4 1.4M13.9 13.9l1.4 1.4M2.5 10h2M15.5 10h2M4.7 15.3l1.4-1.4M13.9 6.1l1.4-1.4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    </svg>
+                </span>
+                <span data-theme-icon-moon>
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                        <path d="M15.5 12.2a6.6 6.6 0 1 1-7.7-7.7 6 6 0 0 0 7.7 7.7Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                </span>
+            </button>
+
             <details class="top-user-dropdown" id="userDropdown">
                 <summary class="top-user-card cursor-pointer">
                     <div class="top-user-avatar">
@@ -33,19 +52,6 @@
                         </svg>
                         Profil Saya
                     </a>
-                    <button type="button" class="top-user-dropdown-link" data-theme-toggle>
-                        <span data-theme-icon-sun class="hidden">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                <path d="M12 3V5M12 19V21M4.93 4.93L6.34 6.34M17.66 17.66L19.07 19.07M3 12H5M19 12H21M4.93 19.07L6.34 17.66M17.66 6.34L19.07 4.93M16 12C16 14.2091 14.2091 16 12 16C9.79086 16 8 14.2091 8 12C8 9.79086 9.79086 8 12 8C14.2091 8 16 9.79086 16 12Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        <span data-theme-icon-moon>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                                <path d="M21 12.79C20.6842 16.2992 17.7278 19 14 19C9.58172 19 6 15.4183 6 11C6 7.27223 8.70076 4.3158 12.21 4C11.4032 5.09316 10.9263 6.44252 10.9263 7.90307C10.9263 11.5301 13.8699 14.4737 17.4969 14.4737C18.9575 14.4737 20.3068 13.9968 21.4 13.19C21.1414 13.0048 21.0073 12.8967 21 12.79Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                        </span>
-                        <span data-theme-label>Mode Gelap</span>
-                    </button>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button type="submit" class="top-user-dropdown-link text-red-600">

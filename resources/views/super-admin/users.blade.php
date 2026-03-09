@@ -16,11 +16,11 @@
                 <table class="table-base" id="usersTable">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'name', 'sort_dir' => $nextDir])) }}">Nama</a></th>
-                        <th class="px-4 py-3"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'email', 'sort_dir' => $nextDir])) }}">Email</a></th>
-                        <th class="px-4 py-3"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'role', 'sort_dir' => $nextDir])) }}">Role</a></th>
-                        <th class="px-4 py-3"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'status', 'sort_dir' => $nextDir])) }}">Status</a></th>
-                        <th class="px-4 py-3">Aksi</th>
+                        <th class="px-4 py-3" style="width: 20%;"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'name', 'sort_dir' => $nextDir])) }}">Nama</a></th>
+                        <th class="px-4 py-3" style="width: 25%;"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'email', 'sort_dir' => $nextDir])) }}">Email</a></th>
+                        <th class="px-4 py-3" style="width: 15%;"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'role', 'sort_dir' => $nextDir])) }}">Role</a></th>
+                        <th class="px-4 py-3" style="width: 15%;"><a href="{{ route('super-admin.users.index', array_merge(request()->query(), ['sort_by' => 'status', 'sort_dir' => $nextDir])) }}">Status</a></th>
+                        <th class="px-4 py-3 table-action-col" style="width: 25%;">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -44,7 +44,7 @@
                                         <option value="nonaktif" @selected($item->status === 'nonaktif')>nonaktif</option>
                                     </select>
                             </td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 table-action-col">
                                     <button class="btn-compact">Update</button>
                                 </form>
                             </td>
@@ -57,6 +57,5 @@
         </article>
     </section>
 @endsection
-
 
 

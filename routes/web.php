@@ -79,12 +79,24 @@ Route::middleware(['auth', 'session.login'])->group(function () {
     });
 
     Route::prefix('dosen')->name('dosen.')->middleware('role:dosen,super_admin')->group(function () {
-        Route::get('/jadwal', [DosenController::class, 'jadwal'])->middleware('ability:jadwal.view')->name('jadwal.index');
-        Route::get('/nilai', [DosenController::class, 'nilai'])->middleware('ability:nilai.manage')->name('nilai.index');
-        Route::post('/nilai', [DosenController::class, 'storeNilai'])->middleware('ability:nilai.manage')->name('nilai.store');
-        Route::get('/nilai/export', [DosenController::class, 'exportNilaiCsv'])->middleware('ability:nilai.manage')->name('nilai.export');
-        Route::get('/monitoring-mahasiswa', [DosenController::class, 'monitoringMahasiswa'])->middleware('ability:mahasiswa.monitor')->name('monitoring-mahasiswa.index');
-        Route::get('/evaluasi-saya', [DosenController::class, 'evaluasiSaya'])->middleware('ability:mahasiswa.monitor')->name('evaluasi-saya.index');
+        Route::get('/jadwal', [DosenController::class, 'jadwal'])
+            ->middleware(['ability:jadwal.view', 'dosen_jabatan:Wakil Rektor,Dekan,Wakil Dekan,Kaprodi,Ketua Prodi,Sekretaris Prodi,Dosen Pembimbing Akademik,Koordinator Mata Kuliah,Dosen Pengampu'])
+            ->name('jadwal.index');
+        Route::get('/nilai', [DosenController::class, 'nilai'])
+            ->middleware(['ability:nilai.manage', 'dosen_jabatan:Sekretaris Prodi,Dosen Pembimbing Akademik,Koordinator Mata Kuliah,Dosen Pengampu'])
+            ->name('nilai.index');
+        Route::post('/nilai', [DosenController::class, 'storeNilai'])
+            ->middleware(['ability:nilai.manage', 'dosen_jabatan:Sekretaris Prodi,Dosen Pembimbing Akademik,Koordinator Mata Kuliah,Dosen Pengampu'])
+            ->name('nilai.store');
+        Route::get('/nilai/export', [DosenController::class, 'exportNilaiCsv'])
+            ->middleware(['ability:nilai.manage', 'dosen_jabatan:Sekretaris Prodi,Dosen Pembimbing Akademik,Koordinator Mata Kuliah,Dosen Pengampu'])
+            ->name('nilai.export');
+        Route::get('/monitoring-mahasiswa', [DosenController::class, 'monitoringMahasiswa'])
+            ->middleware(['ability:mahasiswa.monitor', 'dosen_jabatan:Rektor,Wakil Rektor,Dekan,Wakil Dekan,Kaprodi,Ketua Prodi,Dosen Pembimbing Akademik'])
+            ->name('monitoring-mahasiswa.index');
+        Route::get('/evaluasi-saya', [DosenController::class, 'evaluasiSaya'])
+            ->middleware(['ability:mahasiswa.monitor', 'dosen_jabatan:Rektor,Wakil Rektor,Dekan,Wakil Dekan,Kaprodi,Ketua Prodi,Sekretaris Prodi,Dosen Pembimbing Akademik,Koordinator Mata Kuliah,Dosen Pengampu'])
+            ->name('evaluasi-saya.index');
     });
 
     Route::prefix('akademik')->name('akademik.')->middleware('role:admin_akademik,super_admin')->group(function () {

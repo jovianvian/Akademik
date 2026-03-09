@@ -1,59 +1,91 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    <section class="grid grid-cols-12 gap-4 md:gap-6">
-        <article class="card-panel xl:col-span-4">
-            <h2 class="text-base font-semibold text-gray-900">Tambah Fakultas</h2>
-            <form action="{{ route('master.fakultas.store') }}" method="POST" class="mt-4 space-y-3">
-                @csrf
-                <input name="nama_fakultas" class="input-text" placeholder="Nama fakultas">
-                @error('nama_fakultas') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                <button class="btn-primary" type="submit">Simpan</button>
-            </form>
-            @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
-        </article>
+    <x-admin.page-layout
+        title="Master Fakultas"
+        description="Kelola data fakultas secara terpusat."
+        add-label="+ Tambah Fakultas"
+        add-target="fakultasFormModal"
+    >
+        <x-slot:toolbar>
+            <x-admin.toolbar-filter>
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search fakultas..." data-live-search-target="#fakultasTable">
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
+                </div>
+            </x-admin.toolbar-filter>
+        </x-slot:toolbar>
 
-        <article class="card-panel xl:col-span-8">
-            <h2 class="text-base font-semibold text-gray-900">Daftar Fakultas</h2>
-            <div class="filter-toolbar mt-3">
-                <input type="text" class="input-select w-full md:w-72" placeholder="Cari fakultas..." data-live-search-target="#fakultasTable">
-            </div>
-            <div class="mt-4 table-wrap">
-                <table class="table-base" id="fakultasTable">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3">Nama Fakultas</th>
-                        <th class="px-4 py-3">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                    @forelse($items as $item)
-                        <tr>
-                            <td class="px-4 py-3">
-                                <form action="{{ route('master.fakultas.update', $item->id) }}" method="POST" class="flex items-center gap-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input name="nama_fakultas" value="{{ $item->nama_fakultas }}" class="input-select">
-                                    <button class="btn-compact">Edit</button>
-                                </form>
-                            </td>
-                            <td class="px-4 py-3">
-                                <form action="{{ route('master.fakultas.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin soft delete fakultas ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-compact-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="2" class="px-4 py-3 text-gray-500">Belum ada data.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </article>
-    </section>
+        <x-admin.data-table id="fakultasTable">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3" style="width: 70%;">Nama Fakultas</th>
+                <th class="px-4 py-3 table-action-col" style="width: 30%;">Aksi</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            @forelse($items as $item)
+                <tr>
+                    <td class="px-4 py-3 font-medium">{{ $item->nama_fakultas }}</td>
+                    <td class="px-4 py-3 table-action-col">
+                        <div class="table-actions justify-center">
+                            <button
+                                type="button"
+                                class="action-btn action-btn-edit"
+                                title="Edit"
+                                data-modal-open="fakultasFormModal"
+                                data-form-title="Edit Fakultas"
+                                data-form-action="{{ route('master.fakultas.update', $item->id) }}"
+                                data-form-method="PATCH"
+                                data-form-submit="Simpan Perubahan"
+                                data-form-values='{{ e(json_encode(["nama_fakultas" => $item->nama_fakultas])) }}'
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <form action="{{ route('master.fakultas.destroy', $item->id) }}" method="POST" data-confirm-delete data-delete-label="fakultas ini">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-btn action-btn-delete" title="Hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="2" class="px-4 py-4 text-gray-500">Belum ada data fakultas.</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </x-admin.data-table>
+        <div class="mt-4">{{ $items->links() }}</div>
+    </x-admin.page-layout>
+
+    <x-admin.resource-form-modal
+        id="fakultasFormModal"
+        title="Tambah Fakultas"
+        action="{{ route('master.fakultas.store') }}"
+        method="POST"
+        submit-label="Simpan"
+        size="max-w-md"
+    >
+        <input name="nama_fakultas" class="input-text" placeholder="Nama fakultas" value="{{ old('nama_fakultas') }}" required>
+        @error('nama_fakultas') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+    </x-admin.resource-form-modal>
 @endsection
 
-
-
+@push('scripts')
+    <script>
+        (function () {
+            @if($errors->any() && old('_modal') === 'fakultasFormModal')
+                const modal = document.getElementById('fakultasFormModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('open');
+                }
+            @endif
+        })();
+    </script>
+@endpush

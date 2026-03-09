@@ -10,11 +10,11 @@
                 <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left">Tabel</th>
-                        <th class="px-4 py-3 text-left">Data</th>
-                        <th class="px-4 py-3 text-left">Deleted At</th>
-                        <th class="px-4 py-3 text-left">Deleted By</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
+                        <th class="px-4 py-3 text-left" style="width: 16%;">Tabel</th>
+                        <th class="px-4 py-3 text-left" style="width: 31%;">Data</th>
+                        <th class="px-4 py-3 text-left" style="width: 19%;">Deleted At</th>
+                        <th class="px-4 py-3 text-left" style="width: 16%;">Deleted By</th>
+                        <th class="px-4 py-3 text-left table-action-col" style="width: 18%;">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -24,7 +24,7 @@
                             <td class="px-4 py-3">{{ $row->label }}</td>
                             <td class="px-4 py-3">{{ $row->deleted_at }}</td>
                             <td class="px-4 py-3">{{ $row->deleted_by_name ?? '-' }}</td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 table-action-col">
                                 <form method="POST" action="{{ route('super-admin.master-recovery.restore') }}">
                                     @csrf
                                     <input type="hidden" name="table_name" value="{{ $row->table_name }}">
@@ -78,5 +78,4 @@
         </article>
     </section>
 @endsection
-
 

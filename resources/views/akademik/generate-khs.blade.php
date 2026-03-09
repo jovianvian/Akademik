@@ -1,4 +1,4 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
@@ -10,12 +10,12 @@
                 <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left">Mahasiswa</th>
-                        <th class="px-4 py-3 text-left">Periode</th>
-                        <th class="px-4 py-3 text-left">Status KRS</th>
-                        <th class="px-4 py-3 text-left">Lock Nilai</th>
-                        <th class="px-4 py-3 text-left">Nilai Terisi</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
+                        <th class="px-4 py-3 text-left" style="width: 24%;">Mahasiswa</th>
+                        <th class="px-4 py-3 text-left" style="width: 14%;">Periode</th>
+                        <th class="px-4 py-3 text-left" style="width: 13%;">Status KRS</th>
+                        <th class="px-4 py-3 text-left" style="width: 12%;">Lock Nilai</th>
+                        <th class="px-4 py-3 text-left" style="width: 12%;">Nilai Terisi</th>
+                        <th class="px-4 py-3 text-left table-action-col" style="width: 25%;">Aksi</th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -32,7 +32,7 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3">{{ $item->total_nilai }}/{{ $item->total_mk }}</td>
-                            <td class="px-4 py-3">
+                            <td class="px-4 py-3 table-action-col">
                                 <form method="POST" action="{{ route('akademik.generate-khs.finalize', $item->id) }}">
                                     @csrf
                                     <button type="submit" class="btn-compact disabled:opacity-50" @disabled($item->nilai_terkunci)>
@@ -54,6 +54,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $items->links() }}</div>
         </article>
     </section>
 @endsection

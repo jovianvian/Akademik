@@ -1,71 +1,100 @@
-﻿@extends('layouts.app')
+@extends('layouts.app')
 
 @section('content')
-    <section class="grid grid-cols-12 gap-4 md:gap-6">
-        <article class="card-panel xl:col-span-4">
-            <h2 class="text-base font-semibold text-gray-900">Tambah Program Studi</h2>
-            <form action="{{ route('master.prodi.store') }}" method="POST" class="mt-4 space-y-3">
-                @csrf
-                <input name="nama_prodi" class="input-text" placeholder="Nama prodi">
-                <select name="fakultas_id" class="input-text">
-                    <option value="">Pilih fakultas</option>
-                    @foreach($fakultas as $f)
-                        <option value="{{ $f->id }}">{{ $f->nama_fakultas }}</option>
-                    @endforeach
-                </select>
-                @error('nama_prodi') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                @error('fakultas_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
-                <button class="btn-primary" type="submit">Simpan</button>
-            </form>
-            @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
-        </article>
+    <x-admin.page-layout
+        title="Master Program Studi"
+        description="Kelola program studi dan pemetaan fakultas."
+        add-label="+ Tambah Prodi"
+        add-target="prodiFormModal"
+    >
+        <x-slot:toolbar>
+            <x-admin.toolbar-filter>
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search prodi/fakultas..." data-live-search-target="#prodiTable">
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
+                </div>
+            </x-admin.toolbar-filter>
+        </x-slot:toolbar>
 
-        <article class="card-panel xl:col-span-8">
-            <h2 class="text-base font-semibold text-gray-900">Daftar Program Studi</h2>
-            <div class="mt-4 table-wrap">
-                <table class="table-base">
-                    <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left">Prodi</th>
-                        <th class="px-4 py-3 text-left">Fakultas</th>
-                        <th class="px-4 py-3 text-left">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                    @forelse($items as $item)
-                        <tr>
-                            <td class="px-4 py-3">
-                                <form action="{{ route('master.prodi.update', $item->id) }}" method="POST" class="flex items-center gap-2">
-                                    @csrf
-                                    @method('PATCH')
-                                    <input name="nama_prodi" value="{{ $item->nama_prodi }}" class="input-select">
-                            </td>
-                            <td class="px-4 py-3">
-                                    <select name="fakultas_id" class="input-select">
-                                        @foreach($fakultas as $f)
-                                            <option value="{{ $f->id }}" @selected($f->id === $item->fakultas_id)>{{ $f->nama_fakultas }}</option>
-                                        @endforeach
-                                    </select>
-                            </td>
-                            <td class="px-4 py-3">
-                                    <button class="btn-compact">Edit</button>
-                                </form>
-                                <form action="{{ route('master.prodi.destroy', $item->id) }}" method="POST" class="mt-2" onsubmit="return confirm('Yakin soft delete prodi ini?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn-compact-danger">Delete</button>
-                                </form>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="3" class="px-4 py-3 text-gray-500">Belum ada data.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </article>
-    </section>
+        <x-admin.data-table id="prodiTable">
+            <thead class="bg-gray-50">
+            <tr>
+                <th class="px-4 py-3" style="width: 38%;">Program Studi</th>
+                <th class="px-4 py-3" style="width: 42%;">Fakultas</th>
+                <th class="px-4 py-3 table-action-col" style="width: 20%;">Aksi</th>
+            </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+            @forelse($items as $item)
+                <tr>
+                    <td class="px-4 py-3">{{ $item->nama_prodi }}</td>
+                    <td class="px-4 py-3">{{ $item->nama_fakultas }}</td>
+                    <td class="px-4 py-3 table-action-col">
+                        <div class="table-actions justify-center">
+                            <button
+                                type="button"
+                                class="action-btn action-btn-edit"
+                                title="Edit"
+                                data-modal-open="prodiFormModal"
+                                data-form-title="Edit Program Studi"
+                                data-form-action="{{ route('master.prodi.update', $item->id) }}"
+                                data-form-method="PATCH"
+                                data-form-submit="Simpan Perubahan"
+                                data-form-values='{{ e(json_encode(["nama_prodi" => $item->nama_prodi, "fakultas_id" => (string) $item->fakultas_id])) }}'
+                            >
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <form action="{{ route('master.prodi.destroy', $item->id) }}" method="POST" data-confirm-delete data-delete-label="program studi ini">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="action-btn action-btn-delete" title="Hapus">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="3" class="px-4 py-4 text-gray-500">Belum ada data program studi.</td>
+                </tr>
+            @endforelse
+            </tbody>
+        </x-admin.data-table>
+        <div class="mt-4">{{ $items->links() }}</div>
+    </x-admin.page-layout>
+
+    <x-admin.resource-form-modal
+        id="prodiFormModal"
+        title="Tambah Program Studi"
+        action="{{ route('master.prodi.store') }}"
+        method="POST"
+        submit-label="Simpan"
+        size="max-w-xl"
+    >
+        <input name="nama_prodi" class="input-text" placeholder="Nama prodi" value="{{ old('nama_prodi') }}" required>
+        <select name="fakultas_id" class="input-text" required>
+            <option value="">Pilih fakultas</option>
+            @foreach($fakultas as $f)
+                <option value="{{ $f->id }}" @selected((string) old('fakultas_id') === (string) $f->id)>{{ $f->nama_fakultas }}</option>
+            @endforeach
+        </select>
+        @error('nama_prodi') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('fakultas_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+    </x-admin.resource-form-modal>
 @endsection
 
-
-
+@push('scripts')
+    <script>
+        (function () {
+            @if($errors->any() && old('_modal') === 'prodiFormModal')
+                const modal = document.getElementById('prodiFormModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('open');
+                }
+            @endif
+        })();
+    </script>
+@endpush

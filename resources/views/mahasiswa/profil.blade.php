@@ -41,6 +41,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $dosenPaAktif->links() }}</div>
         </article>
 
         <article class="card-panel col-span-12">
@@ -73,7 +74,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $statusLogs->links() }}</div>
         </article>
     </section>
 @endsection
-

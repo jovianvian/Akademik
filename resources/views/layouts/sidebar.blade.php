@@ -2,6 +2,11 @@
     @php
         $user = auth()->user();
         $evaluasiEnabled = \App\Support\AcademicSetting::evaluasiEnabled();
+        $isDosen = $user?->hasRole('dosen');
+        $canJadwalDosen = ! $isDosen || $user->hasDosenJabatan('Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
+        $canInputNilaiDosen = ! $isDosen || $user->hasDosenJabatan('Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
+        $canMonitorDosen = ! $isDosen || $user->hasDosenJabatan('Rektor', 'Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Dosen Pembimbing Akademik');
+        $canEvaluasiDosen = ! $isDosen || $user->hasDosenJabatan('Rektor', 'Wakil Rektor', 'Dekan', 'Wakil Dekan', 'Kaprodi', 'Ketua Prodi', 'Sekretaris Prodi', 'Dosen Pembimbing Akademik', 'Koordinator Mata Kuliah', 'Dosen Pengampu');
     @endphp
 
     <div class="pb-7" style="padding-top: 26px;">
@@ -79,17 +84,17 @@
             <details class="sidebar-group" data-menu-group="dosen" data-default-open="{{ request()->routeIs('dosen.*') ? '1' : '0' }}" {{ request()->routeIs('dosen.*') ? 'open' : '' }}>
                 <summary class="sidebar-summary"><span>Dosen</span><svg class="sidebar-chevron" width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 8L10 13L15 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
                 <div class="px-2 pb-2">
-                    @if($user->hasAbility('jadwal.view'))
+                    @if($user->hasAbility('jadwal.view') && $canJadwalDosen)
                         <a href="{{ route('dosen.jadwal.index') }}" class="menu-item {{ request()->routeIs('dosen.jadwal.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Jadwal Mengajar</a>
                     @endif
-                    @if($user->hasAbility('nilai.manage'))
+                    @if($user->hasAbility('nilai.manage') && $canInputNilaiDosen)
                         <a href="{{ route('dosen.nilai.index') }}" class="menu-item {{ request()->routeIs('dosen.nilai.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Input Nilai</a>
                     @endif
-                    @if($user->hasAbility('mahasiswa.monitor'))
+                    @if($user->hasAbility('mahasiswa.monitor') && $canMonitorDosen)
                         <a href="{{ route('dosen.monitoring-mahasiswa.index') }}" class="menu-item {{ request()->routeIs('dosen.monitoring-mahasiswa.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Monitoring Mahasiswa</a>
-                        @if($evaluasiEnabled)
-                            <a href="{{ route('dosen.evaluasi-saya.index') }}" class="menu-item {{ request()->routeIs('dosen.evaluasi-saya.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Evaluasi Saya</a>
-                        @endif
+                    @endif
+                    @if($user->hasAbility('mahasiswa.monitor') && $evaluasiEnabled && $canEvaluasiDosen)
+                        <a href="{{ route('dosen.evaluasi-saya.index') }}" class="menu-item {{ request()->routeIs('dosen.evaluasi-saya.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Evaluasi Saya</a>
                     @endif
                 </div>
             </details>

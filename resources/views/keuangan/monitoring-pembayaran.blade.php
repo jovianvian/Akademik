@@ -1,6 +1,16 @@
 ﻿@extends('layouts.app')
 
 @section('content')
+    @php
+        $statusLabel = fn (string $status) => match ($status) {
+            'open' => 'Menunggu',
+            'partial' => 'Sebagian Dibayar',
+            'paid' => 'Lunas',
+            'disputed' => 'Sengketa',
+            'void' => 'Dibatalkan',
+            default => strtoupper($status),
+        };
+    @endphp
     <section class="grid grid-cols-12 gap-4 md:gap-6">
         <article class="card-panel col-span-12">
             <div class="flex flex-wrap items-end justify-between gap-3">
@@ -18,7 +28,7 @@
                     <select name="status" class="input-select">
                         <option value="">Semua Status</option>
                         @foreach(['open','partial','paid','disputed','void'] as $s)
-                            <option value="{{ $s }}" @selected((string) $selectedStatus === (string) $s)>{{ strtoupper($s) }}</option>
+                            <option value="{{ $s }}" @selected((string) $selectedStatus === (string) $s)>{{ $statusLabel($s) }}</option>
                         @endforeach
                     </select>
                     <button class="btn-primary">Filter</button>
@@ -44,7 +54,7 @@
                             <td class="px-4 py-3">{{ $item->tahun }} / {{ strtoupper($item->semester) }}</td>
                             <td class="px-4 py-3">Rp{{ number_format((float) $item->jumlah, 0, ',', '.') }}</td>
                             <td class="px-4 py-3">Rp{{ number_format((float) $item->total_bayar, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3">{{ strtoupper($item->status) }}</td>
+                            <td class="px-4 py-3">{{ $statusLabel($item->status) }}</td>
                             <td class="px-4 py-3">{{ $item->pembayaran_terakhir ?? '-' }}</td>
                         </tr>
                     @empty
@@ -57,6 +67,5 @@
         </article>
     </section>
 @endsection
-
 
 

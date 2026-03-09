@@ -23,6 +23,7 @@ class AuthController extends Controller
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+        $remember = $request->boolean('remember');
 
         $failedAttempts = DB::table('login_attempts')
             ->where('email', $credentials['email'])
@@ -53,7 +54,7 @@ class AuthController extends Controller
             }
         }
 
-        if (! Auth::attempt($credentials, false)) {
+        if (! Auth::attempt($credentials, $remember)) {
             $this->logAttempt($credentials['email'], false, $request);
             return back()->withErrors([
                 'email' => 'Email atau password tidak valid.',
@@ -99,7 +100,7 @@ class AuthController extends Controller
         } elseif ($user?->hasRole('admin_keuangan')) {
             $target = '/keuangan/tagihan';
         } elseif ($user?->hasRole('dosen')) {
-            $target = '/dosen/jadwal';
+            $target = $user->hasDosenJabatan('Rektor') ? '/dosen/monitoring-mahasiswa' : '/dosen/jadwal';
         }
 
         AuditLogger::log(

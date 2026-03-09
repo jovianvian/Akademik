@@ -1,6 +1,16 @@
 ﻿@extends('layouts.app')
 
 @section('content')
+    @php
+        $statusLabel = fn (string $status) => match ($status) {
+            'open' => 'Menunggu',
+            'partial' => 'Sebagian Dibayar',
+            'paid' => 'Lunas',
+            'disputed' => 'Sengketa',
+            'void' => 'Dibatalkan',
+            default => strtoupper($status),
+        };
+    @endphp
     <section class="grid grid-cols-12 gap-4 md:gap-6">
         <article class="card-panel col-span-12">
             <h2 class="text-base font-semibold text-gray-900">Status Pembayaran UKT</h2>
@@ -24,7 +34,7 @@
                             <td class="px-4 py-3">{{ $item->tahun }} {{ ucfirst($item->semester) }}</td>
                             <td class="px-4 py-3">Rp{{ number_format($item->jumlah, 0, ',', '.') }}</td>
                             <td class="px-4 py-3">Rp{{ number_format($item->total_bayar, 0, ',', '.') }}</td>
-                            <td class="px-4 py-3">{{ strtoupper($item->status) }}</td>
+                            <td class="px-4 py-3">{{ $statusLabel($item->status) }}</td>
                             <td class="px-4 py-3">
                                 <details>
                                     <summary class="cursor-pointer text-brand-600">Lihat transaksi</summary>
@@ -69,7 +79,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="mt-4">{{ $items->links() }}</div>
         </article>
     </section>
 @endsection
-

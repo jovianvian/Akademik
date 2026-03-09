@@ -31,7 +31,7 @@ class MasterDataController extends Controller
     {
         return view('master.fakultas', [
             'title' => 'Master Fakultas',
-            'items' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->get(),
+            'items' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->paginate(10)->withQueryString(),
         ]);
     }
 
@@ -132,7 +132,8 @@ class MasterDataController extends Controller
                 ->whereNull('f.deleted_at')
                 ->select('p.*', 'f.nama_fakultas')
                 ->orderBy('p.nama_prodi')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
             'fakultas' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->get(),
         ]);
     }
@@ -231,7 +232,8 @@ class MasterDataController extends Controller
                 ->whereNull('p.deleted_at')
                 ->select('mk.*', 'p.nama_prodi')
                 ->orderBy('mk.kode_mk')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
             'prodi' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
         ]);
     }
@@ -359,7 +361,8 @@ class MasterDataController extends Controller
                 ->select('j.*', 'mk.kode_mk', 'mk.nama_mk', 'mk.sks', 'd.nama as nama_dosen', 'ta.tahun', 'ta.semester')
                 ->orderBy('j.hari')
                 ->orderBy('j.jam_mulai')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
             'mataKuliah' => DB::table('mata_kuliah')->whereNull('deleted_at')->orderBy('kode_mk')->get(),
             'dosen' => DB::table('dosen')->orderBy('nama')->get(),
             'tahunAkademik' => DB::table('tahun_akademik')->orderByDesc('status_aktif')->orderByDesc('id')->get(),
@@ -500,7 +503,8 @@ class MasterDataController extends Controller
                 ->whereNull('jd.deleted_at')
                 ->select('jd.*', 'd.nidn', 'd.nama as nama_dosen')
                 ->orderByDesc('jd.id')
-                ->get(),
+                ->paginate(10)
+                ->withQueryString(),
             'dosen' => DB::table('dosen')->orderBy('nama')->get(),
             'jabatanOptions' => self::JABATAN_OPTIONS,
         ]);
