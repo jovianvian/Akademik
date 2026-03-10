@@ -1,7 +1,7 @@
 /*
- Navicat Premium Dump SQL
+ Navicat Premium Data Transfer
 
- Source Server         : jo
+ Source Server         : jovian
  Source Server Type    : MySQL
  Source Server Version : 100432 (10.4.32-MariaDB)
  Source Host           : localhost:3306
@@ -11,7 +11,7 @@
  Target Server Version : 100432 (10.4.32-MariaDB)
  File Encoding         : 65001
 
- Date: 10/03/2026 09:12:39
+ Date: 10/03/2026 11:26:21
 */
 
 SET NAMES utf8mb4;
@@ -39,7 +39,7 @@ CREATE TABLE `academic_decisions`  (
   CONSTRAINT `academic_decisions_decided_by_foreign` FOREIGN KEY (`decided_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `academic_decisions_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `academic_decisions_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of academic_decisions
@@ -64,12 +64,13 @@ CREATE TABLE `academic_rule_snapshots`  (
   INDEX `ars_lock_idx`(`locked_at` ASC, `snapshotted_at` ASC) USING BTREE,
   CONSTRAINT `academic_rule_snapshots_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `academic_rule_snapshots_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of academic_rule_snapshots
 -- ----------------------------
-INSERT INTO `academic_rule_snapshots` VALUES (1, 2, '{\"max_sks_default\":24,\"max_sks_ips_3\":24,\"grade_ranges\":[{\"min\":85,\"grade\":\"A\"},{\"min\":80,\"grade\":\"A-\"},{\"min\":75,\"grade\":\"B+\"},{\"min\":70,\"grade\":\"B\"},{\"min\":65,\"grade\":\"B-\"},{\"min\":60,\"grade\":\"C+\"},{\"min\":55,\"grade\":\"C\"},{\"min\":45,\"grade\":\"D\"},{\"min\":0,\"grade\":\"E\"}],\"grade_points\":{\"A\":4,\"A-\":3.7,\"B+\":3.3,\"B\":3,\"B-\":2.7,\"C+\":2.3,\"C\":2,\"D\":1,\"E\":0},\"nilai_bobot\":{\"tugas\":30,\"uts\":25,\"uas\":35,\"kehadiran\":10},\"krs_window\":{\"open_at\":\"2026-02-22 18:11:39\",\"close_at\":\"2026-04-08 18:11:39\"},\"nilai_input_close_at\":\"2026-04-23 18:11:39\"}', '2026-03-09 18:22:58', NULL, NULL, '2026-03-09 18:22:58', '2026-03-09 18:22:58');
+INSERT INTO `academic_rule_snapshots` VALUES (1, 2, '{\"max_sks_default\":24,\"max_sks_ips_3\":24,\"grade_ranges\":[{\"min\":85,\"grade\":\"A\"},{\"min\":80,\"grade\":\"A-\"},{\"min\":75,\"grade\":\"B+\"},{\"min\":70,\"grade\":\"B\"},{\"min\":65,\"grade\":\"B-\"},{\"min\":60,\"grade\":\"C+\"},{\"min\":55,\"grade\":\"C\"},{\"min\":45,\"grade\":\"D\"},{\"min\":0,\"grade\":\"E\"}],\"grade_points\":{\"A\":4,\"A-\":3.7,\"B+\":3.3,\"B\":3,\"B-\":2.7,\"C+\":2.3,\"C\":2,\"D\":1,\"E\":0},\"nilai_bobot\":{\"tugas\":30,\"uts\":25,\"uas\":35,\"kehadiran\":10},\"krs_window\":{\"open_at\":\"2026-02-22 18:11:39\",\"close_at\":\"2026-04-08 18:11:39\"},\"nilai_input_close_at\":\"2026-04-23 18:11:39\"}', '2026-03-09 18:22:58', '2026-03-10 03:50:13', NULL, '2026-03-09 18:22:58', '2026-03-10 03:50:13');
+INSERT INTO `academic_rule_snapshots` VALUES (2, 3, '{\"max_sks_default\":24,\"max_sks_ips_3\":24,\"grade_ranges\":[{\"min\":85,\"grade\":\"A\"},{\"min\":80,\"grade\":\"A-\"},{\"min\":75,\"grade\":\"B+\"},{\"min\":70,\"grade\":\"B\"},{\"min\":65,\"grade\":\"B-\"},{\"min\":60,\"grade\":\"C+\"},{\"min\":55,\"grade\":\"C\"},{\"min\":45,\"grade\":\"D\"},{\"min\":0,\"grade\":\"E\"}],\"grade_points\":{\"A\":4,\"A-\":3.7,\"B+\":3.3,\"B\":3,\"B-\":2.7,\"C+\":2.3,\"C\":2,\"D\":1,\"E\":0},\"nilai_bobot\":{\"tugas\":30,\"uts\":25,\"uas\":35,\"kehadiran\":10},\"krs_window\":{\"open_at\":\"2026-02-22 18:11:39\",\"close_at\":\"2026-04-08 18:11:39\"},\"nilai_input_close_at\":\"2026-04-23 18:11:39\"}', '2026-03-10 04:04:08', NULL, NULL, '2026-03-10 04:04:08', '2026-03-10 04:04:08');
 
 -- ----------------------------
 -- Table structure for academic_settings
@@ -103,7 +104,7 @@ CREATE TABLE `academic_settings`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `academic_settings_updated_by_foreign`(`updated_by` ASC) USING BTREE,
   CONSTRAINT `academic_settings_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of academic_settings
@@ -132,7 +133,7 @@ CREATE TABLE `audit_logs`  (
   INDEX `audit_logs_user_id_foreign`(`user_id` ASC) USING BTREE,
   INDEX `audit_logs_modul_created_at_index`(`modul` ASC, `created_at` ASC) USING BTREE,
   CONSTRAINT `audit_logs_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 39 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of audit_logs
@@ -145,6 +146,36 @@ INSERT INTO `audit_logs` VALUES (5, 1, 'Ubah status tagihan UKT', 'keuangan', 't
 INSERT INTO `audit_logs` VALUES (6, 1, 'Soft delete fakultas', 'master_fakultas', 'fakultas', 2, '{\"deleted_data\":{\"nama_fakultas\":\"Fakultas Ekonomi dan Bisnis\"}}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 19:40:59', '2026-03-09 19:40:59');
 INSERT INTO `audit_logs` VALUES (7, 1, 'Restore master data', 'super_admin', 'fakultas', 2, '{\"table_name\":\"fakultas\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 19:41:28', '2026-03-09 19:41:28');
 INSERT INTO `audit_logs` VALUES (8, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 01:55:54', '2026-03-10 01:55:54');
+INSERT INTO `audit_logs` VALUES (9, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 02:24:33', '2026-03-10 02:24:33');
+INSERT INTO `audit_logs` VALUES (10, NULL, 'Logout', 'auth', 'users', 1, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:25:08', '2026-03-10 03:25:08');
+INSERT INTO `audit_logs` VALUES (11, 19, 'Login sukses', 'auth', 'users', 19, '{\"target\":\"\\/krs\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:28:32', '2026-03-10 03:28:32');
+INSERT INTO `audit_logs` VALUES (12, NULL, 'Logout', 'auth', 'users', 19, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:32:19', '2026-03-10 03:32:19');
+INSERT INTO `audit_logs` VALUES (13, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:32:28', '2026-03-10 03:32:28');
+INSERT INTO `audit_logs` VALUES (14, NULL, 'Logout', 'auth', 'users', 1, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:37:00', '2026-03-10 03:37:00');
+INSERT INTO `audit_logs` VALUES (15, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:39:46', '2026-03-10 03:39:46');
+INSERT INTO `audit_logs` VALUES (16, 1, 'Update role/status user', 'super_admin', 'users', 2, '{\"role_id\":\"2\",\"status\":\"nonaktif\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:40:36', '2026-03-10 03:40:36');
+INSERT INTO `audit_logs` VALUES (17, NULL, 'Logout', 'auth', 'users', 1, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:40:39', '2026-03-10 03:40:39');
+INSERT INTO `audit_logs` VALUES (18, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:40:59', '2026-03-10 03:40:59');
+INSERT INTO `audit_logs` VALUES (19, 1, 'Update role/status user', 'super_admin', 'users', 2, '{\"role_id\":\"2\",\"status\":\"aktif\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:41:10', '2026-03-10 03:41:10');
+INSERT INTO `audit_logs` VALUES (20, NULL, 'Logout', 'auth', 'users', 1, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:43:14', '2026-03-10 03:43:14');
+INSERT INTO `audit_logs` VALUES (21, 2, 'Login sukses', 'auth', 'users', 2, '{\"target\":\"\\/master\\/fakultas\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:43:35', '2026-03-10 03:43:35');
+INSERT INTO `audit_logs` VALUES (22, 3, 'Login sukses', 'auth', 'users', 3, '{\"target\":\"\\/keuangan\\/tagihan\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:44:52', '2026-03-10 03:44:52');
+INSERT INTO `audit_logs` VALUES (23, NULL, 'Logout', 'auth', 'users', 3, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:49:36', '2026-03-10 03:49:36');
+INSERT INTO `audit_logs` VALUES (24, 31, 'Login sukses', 'auth', 'users', 31, '{\"target\":\"\\/krs\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:49:53', '2026-03-10 03:49:53');
+INSERT INTO `audit_logs` VALUES (25, 2, 'Generate/finalisasi KHS', 'akademik', 'krs', 13, '{\"status_krs\":\"final\",\"nilai_terkunci\":true}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:50:13', '2026-03-10 03:50:13');
+INSERT INTO `audit_logs` VALUES (26, 2, 'Override unlock nilai', 'akademik', 'krs', 13, '{\"nilai_terkunci\":false}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:50:26', '2026-03-10 03:50:26');
+INSERT INTO `audit_logs` VALUES (27, 2, 'Generate/finalisasi KHS', 'akademik', 'krs', 13, '{\"status_krs\":\"final\",\"nilai_terkunci\":true}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:50:52', '2026-03-10 03:50:52');
+INSERT INTO `audit_logs` VALUES (28, 2, 'Override unlock nilai', 'akademik', 'krs', 13, '{\"nilai_terkunci\":false}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:53:19', '2026-03-10 03:53:19');
+INSERT INTO `audit_logs` VALUES (29, NULL, 'Logout', 'auth', 'users', 2, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:56:24', '2026-03-10 03:56:24');
+INSERT INTO `audit_logs` VALUES (30, 3, 'Login sukses', 'auth', 'users', 3, '{\"target\":\"\\/keuangan\\/tagihan\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:57:02', '2026-03-10 03:57:02');
+INSERT INTO `audit_logs` VALUES (31, NULL, 'Logout', 'auth', 'users', 3, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:57:38', '2026-03-10 03:57:38');
+INSERT INTO `audit_logs` VALUES (32, 2, 'Login sukses', 'auth', 'users', 2, '{\"target\":\"\\/master\\/fakultas\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:58:01', '2026-03-10 03:58:01');
+INSERT INTO `audit_logs` VALUES (33, NULL, 'Logout', 'auth', 'users', 31, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:59:22', '2026-03-10 03:59:22');
+INSERT INTO `audit_logs` VALUES (34, 29, 'Login sukses', 'auth', 'users', 29, '{\"target\":\"\\/krs\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:00:28', '2026-03-10 04:00:28');
+INSERT INTO `audit_logs` VALUES (35, NULL, 'Logout', 'auth', 'users', 29, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:03:58', '2026-03-10 04:03:58');
+INSERT INTO `audit_logs` VALUES (36, 31, 'Login sukses', 'auth', 'users', 31, '{\"target\":\"\\/krs\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:04:07', '2026-03-10 04:04:07');
+INSERT INTO `audit_logs` VALUES (37, NULL, 'Logout', 'auth', 'users', 2, NULL, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:23:29', '2026-03-10 04:23:29');
+INSERT INTO `audit_logs` VALUES (38, 1, 'Login sukses', 'auth', 'users', 1, '{\"target\":\"\\/dashboard\"}', NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:23:46', '2026-03-10 04:23:46');
 
 -- ----------------------------
 -- Table structure for cache
@@ -156,13 +187,13 @@ CREATE TABLE `cache`  (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`) USING BTREE,
   INDEX `cache_expiration_index`(`expiration` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cache
 -- ----------------------------
-INSERT INTO `cache` VALUES ('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1773107812);
-INSERT INTO `cache` VALUES ('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1773107812;', 1773107812);
+INSERT INTO `cache` VALUES ('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:2;', 1773116675);
+INSERT INTO `cache` VALUES ('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1773116675;', 1773116675);
 
 -- ----------------------------
 -- Table structure for cache_locks
@@ -174,7 +205,7 @@ CREATE TABLE `cache_locks`  (
   `expiration` int NOT NULL,
   PRIMARY KEY (`key`) USING BTREE,
   INDEX `cache_locks_expiration_index`(`expiration` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of cache_locks
@@ -198,26 +229,26 @@ CREATE TABLE `dosen`  (
   INDEX `dosen_prodi_id_foreign`(`prodi_id` ASC) USING BTREE,
   CONSTRAINT `dosen_prodi_id_foreign` FOREIGN KEY (`prodi_id`) REFERENCES `program_studi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `dosen_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of dosen
 -- ----------------------------
-INSERT INTO `dosen` VALUES (1, '1987000001', 'Dosen 01', 1, 4, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (2, '1987000002', 'Dosen 02', 2, 5, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (3, '1987000003', 'Dosen 03', 3, 6, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (4, '1987000004', 'Dosen 04', 4, 7, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (5, '1987000005', 'Dosen 05', 1, 8, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (6, '1987000006', 'Dosen 06', 2, 9, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (7, '1987000007', 'Dosen 07', 3, 10, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (8, '1987000008', 'Dosen 08', 4, 11, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (9, '1987000009', 'Dosen 09', 1, 12, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (10, '1987000010', 'Dosen 10', 2, 13, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (11, '1987000011', 'Dosen 11', 3, 14, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (12, '1987000012', 'Dosen 12', 4, 15, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (13, '1987000013', 'Dosen 13', 1, 16, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (14, '1987000014', 'Dosen 14', 2, 17, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `dosen` VALUES (15, '1987000015', 'Dosen 15', 3, 18, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `dosen` VALUES (1, '1987000001', 'Dosen Budi Santoso', 1, 4, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (2, '1987000002', 'Dosen Siti Rahmawati', 2, 5, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (3, '1987000003', 'Dosen Agus Pratama', 3, 6, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (4, '1987000004', 'Dosen Rina Kurniawati', 4, 7, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (5, '1987000005', 'Dosen Dedi Haryanto', 1, 8, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (6, '1987000006', 'Dosen Maya Lestari', 2, 9, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (7, '1987000007', 'Dosen Andi Saputra', 3, 10, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (8, '1987000008', 'Dosen Nina Marlina', 4, 11, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (9, '1987000009', 'Dosen Rizky Maulana', 1, 12, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (10, '1987000010', 'Dosen Wulan Sari', 2, 13, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (11, '1987000011', 'Dosen Farhan Akbar', 3, 14, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (12, '1987000012', 'Dosen Intan Permata', 4, 15, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (13, '1987000013', 'Dosen Yusuf Nugroho', 1, 16, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (14, '1987000014', 'Dosen Citra Anggraini', 2, 17, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `dosen` VALUES (15, '1987000015', 'Dosen Arif Setiawan', 3, 18, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
 
 -- ----------------------------
 -- Table structure for dosen_pa_mahasiswa
@@ -237,7 +268,7 @@ CREATE TABLE `dosen_pa_mahasiswa`  (
   INDEX `dosen_pa_mahasiswa_mahasiswa_id_foreign`(`mahasiswa_id` ASC) USING BTREE,
   CONSTRAINT `dosen_pa_mahasiswa_dosen_id_foreign` FOREIGN KEY (`dosen_id`) REFERENCES `dosen` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `dosen_pa_mahasiswa_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of dosen_pa_mahasiswa
@@ -298,7 +329,7 @@ CREATE TABLE `evaluasi_dosen`  (
   CONSTRAINT `evaluasi_dosen_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `evaluasi_dosen_mata_kuliah_id_foreign` FOREIGN KEY (`mata_kuliah_id`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `evaluasi_dosen_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 18 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of evaluasi_dosen
@@ -332,10 +363,10 @@ CREATE TABLE `failed_jobs`  (
   `queue` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `payload` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `exception` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `failed_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `failed_at` timestamp NOT NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `failed_jobs_uuid_unique`(`uuid` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of failed_jobs
@@ -357,7 +388,7 @@ CREATE TABLE `fakultas`  (
   INDEX `fakultas_deleted_by_foreign`(`deleted_by` ASC) USING BTREE,
   INDEX `fakultas_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `fakultas_deleted_by_foreign` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of fakultas
@@ -387,7 +418,7 @@ CREATE TABLE `jabatan_dosen`  (
   INDEX `jabatan_dosen_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `jabatan_dosen_deleted_by_foreign` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `jabatan_dosen_dosen_id_foreign` FOREIGN KEY (`dosen_id`) REFERENCES `dosen` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of jabatan_dosen
@@ -437,7 +468,7 @@ CREATE TABLE `jadwal`  (
   CONSTRAINT `jadwal_dosen_id_foreign` FOREIGN KEY (`dosen_id`) REFERENCES `dosen` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `jadwal_mata_kuliah_id_foreign` FOREIGN KEY (`mata_kuliah_id`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `jadwal_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of jadwal
@@ -454,6 +485,18 @@ INSERT INTO `jadwal` VALUES (9, 9, 8, 'Rabu', '08:00:00', '10:30:00', 'R-209', 2
 INSERT INTO `jadwal` VALUES (10, 10, 9, 'Kamis', '10:30:00', '13:00:00', 'R-210', 2, '2026-03-09 18:11:39', '2026-03-09 18:11:39', NULL, NULL);
 INSERT INTO `jadwal` VALUES (11, 11, 10, 'Jumat', '13:00:00', '15:30:00', 'R-211', 2, '2026-03-09 18:11:39', '2026-03-09 18:11:39', NULL, NULL);
 INSERT INTO `jadwal` VALUES (12, 12, 11, 'Sabtu', '15:30:00', '18:00:00', 'R-212', 2, '2026-03-09 18:11:39', '2026-03-09 18:11:39', NULL, NULL);
+INSERT INTO `jadwal` VALUES (13, 1, 8, 'Senin', '08:00:00', '10:30:00', 'R-201', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (14, 2, 9, 'Selasa', '10:30:00', '13:00:00', 'R-202', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (15, 3, 10, 'Rabu', '13:00:00', '15:30:00', 'R-203', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (16, 4, 11, 'Kamis', '15:30:00', '18:00:00', 'R-204', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (17, 5, 12, 'Jumat', '08:00:00', '10:30:00', 'R-205', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (18, 6, 13, 'Sabtu', '10:30:00', '13:00:00', 'R-206', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (19, 7, 14, 'Senin', '13:00:00', '15:30:00', 'R-207', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (20, 8, 15, 'Selasa', '15:30:00', '18:00:00', 'R-208', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (21, 9, 8, 'Rabu', '08:00:00', '10:30:00', 'R-209', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (22, 10, 9, 'Kamis', '10:30:00', '13:00:00', 'R-210', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (23, 11, 10, 'Jumat', '13:00:00', '15:30:00', 'R-211', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
+INSERT INTO `jadwal` VALUES (24, 12, 11, 'Sabtu', '15:30:00', '18:00:00', 'R-212', 3, '2026-03-10 04:03:44', '2026-03-10 04:03:44', NULL, NULL);
 
 -- ----------------------------
 -- Table structure for job_batches
@@ -471,7 +514,7 @@ CREATE TABLE `job_batches`  (
   `created_at` int NOT NULL,
   `finished_at` int NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of job_batches
@@ -491,7 +534,7 @@ CREATE TABLE `jobs`  (
   `created_at` int UNSIGNED NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `jobs_queue_index`(`queue` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of jobs
@@ -515,7 +558,7 @@ CREATE TABLE `krs`  (
   INDEX `krs_tahun_akademik_id_foreign`(`tahun_akademik_id` ASC) USING BTREE,
   CONSTRAINT `krs_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `krs_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of krs
@@ -532,7 +575,7 @@ INSERT INTO `krs` VALUES (9, 9, 2, 9, 'final', 0, '2026-03-09 18:11:39', '2026-0
 INSERT INTO `krs` VALUES (10, 10, 2, 8, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `krs` VALUES (11, 11, 2, 8, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `krs` VALUES (12, 12, 2, 6, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `krs` VALUES (13, 13, 2, 9, 'final', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `krs` VALUES (13, 13, 2, 9, 'final', 0, '2026-03-09 18:11:39', '2026-03-10 03:53:19');
 INSERT INTO `krs` VALUES (14, 14, 2, 8, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `krs` VALUES (15, 15, 2, 8, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `krs` VALUES (16, 16, 2, 6, 'draft', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
@@ -561,7 +604,7 @@ CREATE TABLE `krs_detail`  (
   INDEX `krs_detail_jadwal_id_foreign`(`jadwal_id` ASC) USING BTREE,
   CONSTRAINT `krs_detail_jadwal_id_foreign` FOREIGN KEY (`jadwal_id`) REFERENCES `jadwal` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `krs_detail_krs_id_foreign` FOREIGN KEY (`krs_id`) REFERENCES `krs` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 70 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 70 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of krs_detail
@@ -646,12 +689,12 @@ CREATE TABLE `login_attempts`  (
   `ip_address` varchar(45) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL DEFAULT NULL,
   `success` tinyint(1) NOT NULL DEFAULT 0,
   `user_agent` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
-  `attempted_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE CURRENT_TIMESTAMP,
+  `attempted_at` timestamp NOT NULL DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `login_attempts_email_ip_address_attempted_at_index`(`email` ASC, `ip_address` ASC, `attempted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 29 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of login_attempts
@@ -659,6 +702,31 @@ CREATE TABLE `login_attempts`  (
 INSERT INTO `login_attempts` VALUES (1, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 18:22:28', '2026-03-09 18:22:28', '2026-03-09 18:22:28');
 INSERT INTO `login_attempts` VALUES (2, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-09 18:53:25', '2026-03-09 18:53:25', '2026-03-09 18:53:25');
 INSERT INTO `login_attempts` VALUES (3, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 01:55:54', '2026-03-10 01:55:54', '2026-03-10 01:55:54');
+INSERT INTO `login_attempts` VALUES (4, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 02:24:33', '2026-03-10 02:24:33', '2026-03-10 02:24:33');
+INSERT INTO `login_attempts` VALUES (5, 'mhs1@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:25:15', '2026-03-10 03:25:15', '2026-03-10 03:25:15');
+INSERT INTO `login_attempts` VALUES (6, 'mhs01@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:25:39', '2026-03-10 03:25:39', '2026-03-10 03:25:39');
+INSERT INTO `login_attempts` VALUES (7, 'mhs01@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:25:44', '2026-03-10 03:25:44', '2026-03-10 03:25:44');
+INSERT INTO `login_attempts` VALUES (8, 'mhs01@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:26:11', '2026-03-10 03:26:11', '2026-03-10 03:26:11');
+INSERT INTO `login_attempts` VALUES (9, 'mhs01@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:28:32', '2026-03-10 03:28:32', '2026-03-10 03:28:32');
+INSERT INTO `login_attempts` VALUES (10, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:32:28', '2026-03-10 03:32:28', '2026-03-10 03:32:28');
+INSERT INTO `login_attempts` VALUES (11, 'mhs10@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:37:12', '2026-03-10 03:37:12', '2026-03-10 03:37:12');
+INSERT INTO `login_attempts` VALUES (12, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:39:46', '2026-03-10 03:39:46', '2026-03-10 03:39:46');
+INSERT INTO `login_attempts` VALUES (13, 'adminakademik@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:40:47', '2026-03-10 03:40:47', '2026-03-10 03:40:47');
+INSERT INTO `login_attempts` VALUES (14, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:40:59', '2026-03-10 03:40:59', '2026-03-10 03:40:59');
+INSERT INTO `login_attempts` VALUES (15, 'adminakademik@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:43:24', '2026-03-10 03:43:24', '2026-03-10 03:43:24');
+INSERT INTO `login_attempts` VALUES (16, 'adminakademik@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:43:29', '2026-03-10 03:43:29', '2026-03-10 03:43:29');
+INSERT INTO `login_attempts` VALUES (17, 'adminakademik@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:43:35', '2026-03-10 03:43:35', '2026-03-10 03:43:35');
+INSERT INTO `login_attempts` VALUES (18, 'adminkeuangan@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:44:52', '2026-03-10 03:44:52', '2026-03-10 03:44:52');
+INSERT INTO `login_attempts` VALUES (19, 'galih.pranata@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:49:42', '2026-03-10 03:49:42', '2026-03-10 03:49:42');
+INSERT INTO `login_attempts` VALUES (20, 'galih.pranata@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:49:53', '2026-03-10 03:49:53', '2026-03-10 03:49:53');
+INSERT INTO `login_attempts` VALUES (21, 'adminkeuangan@kampus.id.ac', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:56:53', '2026-03-10 03:56:53', '2026-03-10 03:56:53');
+INSERT INTO `login_attempts` VALUES (22, 'adminkeuangan@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:57:02', '2026-03-10 03:57:02', '2026-03-10 03:57:02');
+INSERT INTO `login_attempts` VALUES (23, 'adminakademik@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 03:58:01', '2026-03-10 03:58:01', '2026-03-10 03:58:01');
+INSERT INTO `login_attempts` VALUES (24, 'tiara.maharani@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:00:09', '2026-03-10 04:00:09', '2026-03-10 04:00:09');
+INSERT INTO `login_attempts` VALUES (25, 'raka.saputro@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:00:28', '2026-03-10 04:00:28', '2026-03-10 04:00:28');
+INSERT INTO `login_attempts` VALUES (26, 'galih.pranata@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:04:07', '2026-03-10 04:04:07', '2026-03-10 04:04:07');
+INSERT INTO `login_attempts` VALUES (27, 'superadmin@kampus.ac.id', '127.0.0.1', 0, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:23:36', '2026-03-10 04:23:36', '2026-03-10 04:23:36');
+INSERT INTO `login_attempts` VALUES (28, 'superadmin@kampus.ac.id', '127.0.0.1', 1, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', '2026-03-10 04:23:46', '2026-03-10 04:23:46', '2026-03-10 04:23:46');
 
 -- ----------------------------
 -- Table structure for mahasiswa
@@ -685,36 +753,36 @@ CREATE TABLE `mahasiswa`  (
   INDEX `mahasiswa_prodi_id_foreign`(`prodi_id` ASC) USING BTREE,
   CONSTRAINT `mahasiswa_prodi_id_foreign` FOREIGN KEY (`prodi_id`) REFERENCES `program_studi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `mahasiswa_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mahasiswa
 -- ----------------------------
-INSERT INTO `mahasiswa` VALUES (1, '23010001', 'Mahasiswa 01', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 19, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (2, '23010002', 'Mahasiswa 02', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 20, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (3, '23010003', 'Mahasiswa 03', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 21, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (4, '23010004', 'Mahasiswa 04', 4, 2022, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 22, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (5, '23010005', 'Mahasiswa 05', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 23, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (6, '23010006', 'Mahasiswa 06', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 24, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (7, '23010007', 'Mahasiswa 07', 3, 2025, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 25, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (8, '23010008', 'Mahasiswa 08', 4, 2022, 'aktif', 'suspended_pending_decision', 'aktif', 0, NULL, NULL, 26, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (9, '23010009', 'Mahasiswa 09', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 27, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (10, '23010010', 'Mahasiswa 10', 2, 2024, 'dropout', 'do', 'do', 0, NULL, NULL, 28, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (11, '23010011', 'Mahasiswa 11', 3, 2025, 'aktif', 'aktif', 'aktif', 1, 'Hold finansial menunggu verifikasi.', NULL, 29, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (12, '23010012', 'Mahasiswa 12', 4, 2022, 'lulus', 'alumni', 'lulus', 0, NULL, NULL, 30, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (13, '23010013', 'Mahasiswa 13', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 31, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (14, '23010014', 'Mahasiswa 14', 2, 2024, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 32, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (15, '23010015', 'Mahasiswa 15', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 33, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (16, '23010016', 'Mahasiswa 16', 4, 2022, 'aktif', 'suspended_pending_decision', 'aktif', 0, NULL, NULL, 34, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (17, '23010017', 'Mahasiswa 17', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 35, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (18, '23010018', 'Mahasiswa 18', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 36, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (19, '23010019', 'Mahasiswa 19', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 37, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (20, '23010020', 'Mahasiswa 20', 4, 2022, 'dropout', 'do', 'do', 0, NULL, NULL, 38, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (21, '23010021', 'Mahasiswa 21', 1, 2023, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 39, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (22, '23010022', 'Mahasiswa 22', 2, 2024, 'aktif', 'aktif', 'aktif', 1, 'Hold finansial menunggu verifikasi.', NULL, 40, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (23, '23010023', 'Mahasiswa 23', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 41, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (24, '23010024', 'Mahasiswa 24', 4, 2022, 'lulus', 'alumni', 'lulus', 0, NULL, NULL, 42, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `mahasiswa` VALUES (25, '23010025', 'Mahasiswa 25', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 43, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `mahasiswa` VALUES (1, '23010001', 'Mahasiswa Aldi Ramadhan', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 19, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (2, '23010002', 'Mahasiswa Nabila Putri', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 20, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (3, '23010003', 'Mahasiswa Fajar Hidayat', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 21, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (4, '23010004', 'Mahasiswa Dinda Aulia', 4, 2022, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 22, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (5, '23010005', 'Mahasiswa Rafi Kurniawan', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 23, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (6, '23010006', 'Mahasiswa Nadya Safitri', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 24, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (7, '23010007', 'Mahasiswa Iqbal Prakoso', 3, 2025, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 25, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (8, '23010008', 'Mahasiswa Salsa Oktaviani', 4, 2022, 'aktif', 'suspended_pending_decision', 'aktif', 0, NULL, NULL, 26, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (9, '23010009', 'Mahasiswa Bagas Wicaksono', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 27, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (10, '23010010', 'Mahasiswa Tiara Maharani', 2, 2024, 'dropout', 'do', 'do', 0, NULL, NULL, 28, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (11, '23010011', 'Mahasiswa Raka Saputro', 3, 2025, 'aktif', 'aktif', 'aktif', 1, 'Hold finansial menunggu verifikasi.', NULL, 29, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (12, '23010012', 'Mahasiswa Alya Nurfadila', 4, 2022, 'lulus', 'alumni', 'lulus', 0, NULL, NULL, 30, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (13, '23010013', 'Mahasiswa Galih Pranata', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 31, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (14, '23010014', 'Mahasiswa Syifa Khairunnisa', 2, 2024, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 32, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (15, '23010015', 'Mahasiswa Fikri Ananda', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 33, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (16, '23010016', 'Mahasiswa Dewi Larasati', 4, 2022, 'aktif', 'suspended_pending_decision', 'aktif', 0, NULL, NULL, 34, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (17, '23010017', 'Mahasiswa Ilham Nugraha', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 35, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (18, '23010018', 'Mahasiswa Putri Cahyani', 2, 2024, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 36, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (19, '23010019', 'Mahasiswa Hendra Wijaya', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 37, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (20, '23010020', 'Mahasiswa Rani Puspitasari', 4, 2022, 'dropout', 'do', 'do', 0, NULL, NULL, 38, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (21, '23010021', 'Mahasiswa Dimas Mahendra', 1, 2023, 'cuti', 'nonaktif', 'cuti', 0, NULL, NULL, 39, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (22, '23010022', 'Mahasiswa Anisa Fauziah', 2, 2024, 'aktif', 'aktif', 'aktif', 1, 'Hold finansial menunggu verifikasi.', NULL, 40, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (23, '23010023', 'Mahasiswa Rizal Firmansyah', 3, 2025, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 41, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (24, '23010024', 'Mahasiswa Nisa Amelia', 4, 2022, 'lulus', 'alumni', 'lulus', 0, NULL, NULL, 42, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `mahasiswa` VALUES (25, '23010025', 'Mahasiswa Yoga Pratama', 1, 2023, 'aktif', 'aktif', 'aktif', 0, NULL, NULL, 43, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
 
 -- ----------------------------
 -- Table structure for mahasiswa_enrollment_history
@@ -735,7 +803,7 @@ CREATE TABLE `mahasiswa_enrollment_history`  (
   INDEX `meh_lookup_idx`(`mahasiswa_id` ASC, `effective_from` ASC) USING BTREE,
   CONSTRAINT `mahasiswa_enrollment_history_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `mahasiswa_enrollment_history_set_by_foreign` FOREIGN KEY (`set_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mahasiswa_enrollment_history
@@ -788,7 +856,7 @@ CREATE TABLE `mahasiswa_period_status`  (
   CONSTRAINT `mahasiswa_period_status_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `mahasiswa_period_status_set_by_foreign` FOREIGN KEY (`set_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `mahasiswa_period_status_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mahasiswa_period_status
@@ -838,7 +906,7 @@ CREATE TABLE `mahasiswa_status_logs`  (
   INDEX `mahasiswa_status_logs_mahasiswa_id_created_at_index`(`mahasiswa_id` ASC, `created_at` ASC) USING BTREE,
   CONSTRAINT `mahasiswa_status_logs_changed_by_foreign` FOREIGN KEY (`changed_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `mahasiswa_status_logs_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mahasiswa_status_logs
@@ -866,7 +934,7 @@ CREATE TABLE `mata_kuliah`  (
   INDEX `mata_kuliah_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `mata_kuliah_deleted_by_foreign` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `mata_kuliah_prodi_id_foreign` FOREIGN KEY (`prodi_id`) REFERENCES `program_studi` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of mata_kuliah
@@ -893,7 +961,7 @@ CREATE TABLE `migrations`  (
   `migration` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of migrations
@@ -940,7 +1008,7 @@ CREATE TABLE `nilai`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `nilai_krs_detail_id_unique`(`krs_detail_id` ASC) USING BTREE,
   CONSTRAINT `nilai_krs_detail_id_foreign` FOREIGN KEY (`krs_detail_id`) REFERENCES `krs_detail` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of nilai
@@ -969,7 +1037,7 @@ CREATE TABLE `password_reset_tokens`  (
   `token` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`email`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of password_reset_tokens
@@ -992,7 +1060,7 @@ CREATE TABLE `pembayaran`  (
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `pembayaran_dup_guard_unique`(`tagihan_id` ASC, `tanggal_bayar` ASC, `jumlah_bayar` ASC, `metode_bayar` ASC) USING BTREE,
   CONSTRAINT `pembayaran_tagihan_id_foreign` FOREIGN KEY (`tagihan_id`) REFERENCES `tagihan_ukt` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of pembayaran
@@ -1020,6 +1088,7 @@ INSERT INTO `pembayaran` VALUES (20, 23, '2026-02-18', 2700000.00, 'qris', 'TRX-
 INSERT INTO `pembayaran` VALUES (21, 23, '2026-03-02', 1800000.00, 'cash', 'TRX-PD2-23', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `pembayaran` VALUES (22, 24, '2026-02-19', 3000000.00, 'cash', 'TRX-PD1-24', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `pembayaran` VALUES (23, 24, '2026-03-03', 2000000.00, 'transfer', 'TRX-PD2-24', 0, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `pembayaran` VALUES (24, 26, '2026-03-10', 3500000.00, 'transfer', 'AUTO-SETUP-GALIH-TA3', 0, '2026-03-10 04:03:44', '2026-03-10 04:03:44');
 
 -- ----------------------------
 -- Table structure for permissions
@@ -1033,7 +1102,7 @@ CREATE TABLE `permissions`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `permissions_kode_unique`(`kode` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of permissions
@@ -1070,7 +1139,7 @@ CREATE TABLE `prasyarat_mk`  (
   INDEX `prasyarat_mk_mata_kuliah_prasyarat_id_foreign`(`mata_kuliah_prasyarat_id` ASC) USING BTREE,
   CONSTRAINT `prasyarat_mk_mata_kuliah_id_foreign` FOREIGN KEY (`mata_kuliah_id`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `prasyarat_mk_mata_kuliah_prasyarat_id_foreign` FOREIGN KEY (`mata_kuliah_prasyarat_id`) REFERENCES `mata_kuliah` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of prasyarat_mk
@@ -1095,7 +1164,7 @@ CREATE TABLE `program_studi`  (
   INDEX `program_studi_deleted_at_index`(`deleted_at` ASC) USING BTREE,
   CONSTRAINT `program_studi_deleted_by_foreign` FOREIGN KEY (`deleted_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT,
   CONSTRAINT `program_studi_fakultas_id_foreign` FOREIGN KEY (`fakultas_id`) REFERENCES `fakultas` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of program_studi
@@ -1120,7 +1189,7 @@ CREATE TABLE `role_permissions`  (
   INDEX `role_permissions_permission_id_foreign`(`permission_id` ASC) USING BTREE,
   CONSTRAINT `role_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `role_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 30 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of role_permissions
@@ -1166,7 +1235,7 @@ CREATE TABLE `roles`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `roles_role_name_unique`(`role_name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of roles
@@ -1191,12 +1260,13 @@ CREATE TABLE `sessions`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `sessions_user_id_index`(`user_id` ASC) USING BTREE,
   INDEX `sessions_last_activity_index`(`last_activity` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of sessions
 -- ----------------------------
-INSERT INTO `sessions` VALUES ('4oosFCJkb9SJU8etsjScmZhwJgEU1QsqqrbO20vp', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoiUDBnT1JzeXcxQk55UExJOHAxQWh1bklCMzZHMmVGVkFZbWNFd0VDWSI7czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9kYXNoYm9hcmQiO3M6NToicm91dGUiO3M6OToiZGFzaGJvYXJkIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjEyOiJhdXRoX3VzZXJfaWQiO2k6MTtzOjEyOiJhdXRoX3JvbGVfaWQiO2k6MTtzOjEzOiJhdXRoX2xvZ2luX2F0IjtzOjE5OiIyMDI2LTAzLTEwIDAxOjU1OjU0IjtzOjE4OiJhdXRoX2xhc3RfYWN0aXZpdHkiO2k6MTc3MzEwNzc1NDt9', 1773107756);
+INSERT INTO `sessions` VALUES ('6WgwIEls5uuX7teZ25NlQv2eexc6fWr3uP9pX545', 1, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoieG5Ncm12NGxoTWJSanR3RHA3d3dSZUVJOTlzUUhWdGoxbEhKcEZlWSI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6Mzg6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9rZXVhbmdhbi90YWdpaGFuIjtzOjU6InJvdXRlIjtzOjIyOiJrZXVhbmdhbi50YWdpaGFuLmluZGV4Ijt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MTtzOjEyOiJhdXRoX3VzZXJfaWQiO2k6MTtzOjEyOiJhdXRoX3JvbGVfaWQiO2k6MTtzOjEzOiJhdXRoX2xvZ2luX2F0IjtzOjE5OiIyMDI2LTAzLTEwIDA0OjIzOjQ2IjtzOjE4OiJhdXRoX2xhc3RfYWN0aXZpdHkiO2k6MTc3MzExNjczNjt9', 1773116736);
+INSERT INTO `sessions` VALUES ('DlBiA0H5I9gGVsalTMlO8fjx9MHrzaGKNZMElie5', 31, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36', 'YTo4OntzOjY6Il90b2tlbiI7czo0MDoiTDE2dzZydUFNQklBVVpVTWJzWENXdDVqdzBqWlhWMmpSUzNlVjFraCI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6Mjp7czozOiJ1cmwiO3M6MzY6Imh0dHA6Ly9sb2NhbGhvc3Q6ODAwMC9ldmFsdWFzaS1kb3NlbiI7czo1OiJyb3V0ZSI7czoyNDoibWFoYXNpc3dhLmV2YWx1YXNpLmluZGV4Ijt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MzE7czoxMjoiYXV0aF91c2VyX2lkIjtpOjMxO3M6MTI6ImF1dGhfcm9sZV9pZCI7aTo1O3M6MTM6ImF1dGhfbG9naW5fYXQiO3M6MTk6IjIwMjYtMDMtMTAgMDQ6MDQ6MDciO3M6MTg6ImF1dGhfbGFzdF9hY3Rpdml0eSI7aToxNzczMTE2Mzg1O30=', 1773116385);
 
 -- ----------------------------
 -- Table structure for system_settings
@@ -1213,7 +1283,7 @@ CREATE TABLE `system_settings`  (
   UNIQUE INDEX `system_settings_key_unique`(`key` ASC) USING BTREE,
   INDEX `system_settings_updated_by_foreign`(`updated_by` ASC) USING BTREE,
   CONSTRAINT `system_settings_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of system_settings
@@ -1236,7 +1306,7 @@ CREATE TABLE `tagihan_ukt`  (
   INDEX `tagihan_ukt_tahun_akademik_id_foreign`(`tahun_akademik_id` ASC) USING BTREE,
   CONSTRAINT `tagihan_ukt_mahasiswa_id_foreign` FOREIGN KEY (`mahasiswa_id`) REFERENCES `mahasiswa` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT,
   CONSTRAINT `tagihan_ukt_tahun_akademik_id_foreign` FOREIGN KEY (`tahun_akademik_id`) REFERENCES `tahun_akademik` (`id`) ON DELETE CASCADE ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 26 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 27 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tagihan_ukt
@@ -1266,6 +1336,7 @@ INSERT INTO `tagihan_ukt` VALUES (22, 22, 2, 4000000.00, 'open', '2026-03-09 18:
 INSERT INTO `tagihan_ukt` VALUES (23, 23, 2, 4500000.00, 'paid', '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `tagihan_ukt` VALUES (24, 24, 2, 5000000.00, 'paid', '2026-03-09 18:11:39', '2026-03-09 18:11:39');
 INSERT INTO `tagihan_ukt` VALUES (25, 25, 2, 5500000.00, 'open', '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `tagihan_ukt` VALUES (26, 13, 3, 3500000.00, 'paid', '2026-03-10 04:03:44', '2026-03-10 04:03:44');
 
 -- ----------------------------
 -- Table structure for tahun_akademik
@@ -1283,13 +1354,14 @@ CREATE TABLE `tahun_akademik`  (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `tahun_akademik_tahun_semester_unique`(`tahun` ASC, `semester` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of tahun_akademik
 -- ----------------------------
 INSERT INTO `tahun_akademik` VALUES (1, '2025/2026', 'ganjil', 0, 0, '2025-10-09 18:11:39', '2025-11-09 18:11:39', '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `tahun_akademik` VALUES (2, '2025/2026', 'genap', 1, 1, '2026-02-27 18:11:39', '2026-03-30 18:11:39', '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `tahun_akademik` VALUES (2, '2025/2026', 'genap', 0, 1, '2026-02-27 18:11:39', '2026-03-30 18:11:39', '2026-03-09 18:11:39', '2026-03-10 04:03:44');
+INSERT INTO `tahun_akademik` VALUES (3, '2026/2027', 'ganjil', 1, 1, '2026-03-08 04:03:44', '2026-04-09 04:03:44', '2026-03-10 04:03:44', '2026-03-10 04:03:44');
 
 -- ----------------------------
 -- Table structure for users
@@ -1310,53 +1382,53 @@ CREATE TABLE `users`  (
   UNIQUE INDEX `users_email_unique`(`email` ASC) USING BTREE,
   INDEX `users_role_id_foreign`(`role_id` ASC) USING BTREE,
   CONSTRAINT `users_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE SET NULL ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 44 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 44 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
 INSERT INTO `users` VALUES (1, 1, 'Super Admin', 'superadmin@kampus.ac.id', NULL, '$2y$12$VQk.LRgWsHVa1Rm6WZtahunoQvNuS8A9uAxIPAlU67q7aqDgkPBl6', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (2, 2, 'Admin Akademik', 'adminakademik@kampus.ac.id', NULL, '$2y$12$0NNR0Xhlc2zVNeAUcEIzWuucGPfZoA6FIBdvt95Noca5faSd1dshO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `users` VALUES (2, 2, 'Admin Akademik', 'adminakademik@kampus.ac.id', NULL, '$2y$12$0NNR0Xhlc2zVNeAUcEIzWuucGPfZoA6FIBdvt95Noca5faSd1dshO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:41:10');
 INSERT INTO `users` VALUES (3, 3, 'Admin Keuangan', 'adminkeuangan@kampus.ac.id', NULL, '$2y$12$WtL5rw2KW40TYLrqPPpDBO6Yrmy8rb6IDHjmcfx6AMH1eVuu5zEmS', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (4, 4, 'Dosen 01', 'dosen01@kampus.ac.id', NULL, '$2y$12$3EH7R5ljPTlz/hOjC0egxuI5/O0SKu7tWWnB/5DHmXhxkq.IrKdAi', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (5, 4, 'Dosen 02', 'dosen02@kampus.ac.id', NULL, '$2y$12$Igup4S2AolAqpSV7JqLi0OI5X3.ReBiYFLXxGeXEP9X.Itkw9azgu', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (6, 4, 'Dosen 03', 'dosen03@kampus.ac.id', NULL, '$2y$12$BkYdXF7magjuMo4YQpLlLu12cig8St1nS/f9f1FuHnR9e0BJuhCKW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (7, 4, 'Dosen 04', 'dosen04@kampus.ac.id', NULL, '$2y$12$O9iaA0IqG750.XTkZkEMOe63/yCICFPbZ6ob9xI4xQ7UMyqAKgu0a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (8, 4, 'Dosen 05', 'dosen05@kampus.ac.id', NULL, '$2y$12$POTRHj7km9UoTUuUTk1sdekmXyk9MXjJCtNPP.oWuxrFT4gOVleQK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (9, 4, 'Dosen 06', 'dosen06@kampus.ac.id', NULL, '$2y$12$rKkGpAHhY2kLHsz8FTGcdOcjADnnOoPNCtOfcTDTPBU.e6aMS709y', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (10, 4, 'Dosen 07', 'dosen07@kampus.ac.id', NULL, '$2y$12$h.4f/m1Qo7Nu0vpu5LZ6s.xN.wgsS/YKSrQF9vcCMlgHU.Y85V2rC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (11, 4, 'Dosen 08', 'dosen08@kampus.ac.id', NULL, '$2y$12$TIAF1ks4qeOjlpPCrjLbe.8millnryWVGkUCQap9g.FnrvZYWzSDm', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (12, 4, 'Dosen 09', 'dosen09@kampus.ac.id', NULL, '$2y$12$AG.34JZ3ti102hIC24K54uHayQ50ClBOcZqsrL0MV9mHLxC4VxiyW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (13, 4, 'Dosen 10', 'dosen10@kampus.ac.id', NULL, '$2y$12$SiOxfAh27b08oURgee7rKOyt90XBr7BtPO2xZlPXKLbnZ6tGCMBDi', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (14, 4, 'Dosen 11', 'dosen11@kampus.ac.id', NULL, '$2y$12$dofk3NjhJ3koheb653ahNeSvxQUUsSB9/.Ex2F5uETz8bmmkAYXfO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (15, 4, 'Dosen 12', 'dosen12@kampus.ac.id', NULL, '$2y$12$g/AWMexuCZmYR/Oo5hbkDuOP1F5Itgg63oSOLUwwzWLZJLqoYlY5K', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (16, 4, 'Dosen 13', 'dosen13@kampus.ac.id', NULL, '$2y$12$rCCI274aYx0NWCi1JyxUROd26IUKCoAG4bTVZPppOzRvhFj7b8jkG', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (17, 4, 'Dosen 14', 'dosen14@kampus.ac.id', NULL, '$2y$12$ZVuJcUxKaY/WrCkXHgBYEuyr459iekHv04Q.pOrjTu.HV7U8fFoPS', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (18, 4, 'Dosen 15', 'dosen15@kampus.ac.id', NULL, '$2y$12$E3ejhjItivOwGldhq2NdA.lfE83udi0fXlyOVSZbYCMt0Cu/W913a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (19, 5, 'Mahasiswa 01', 'mhs01@kampus.ac.id', NULL, '$2y$12$2z/KVWJQQ/C1yUc4YH/px.bg8YhL/KH/.yxviAgUuc96I08qQqg8a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (20, 5, 'Mahasiswa 02', 'mhs02@kampus.ac.id', NULL, '$2y$12$HRwxXkElqAMOQ/iJieXos.rp6J4JvmnWfZILJAIbq5iwPFEUS..AO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (21, 5, 'Mahasiswa 03', 'mhs03@kampus.ac.id', NULL, '$2y$12$Cy/fM98UA0pZZcSP0/57N./pB4gbF771hpH1fJCGaqxabIAXaJrmm', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (22, 5, 'Mahasiswa 04', 'mhs04@kampus.ac.id', NULL, '$2y$12$JEqL2o0ngnnzqBk1EhfWme/4Rzt6y98.PWj64n/jYWvryU017BbIC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (23, 5, 'Mahasiswa 05', 'mhs05@kampus.ac.id', NULL, '$2y$12$E9IypC5wGAKFDnyXnSD/Ue5ZUNKfFx.AfoPbqoWBq3ASFrlca9ZVC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (24, 5, 'Mahasiswa 06', 'mhs06@kampus.ac.id', NULL, '$2y$12$hP87xLA9Y2DjcinGVZtmAeegdOdbciKmHrbsUunekpgQcnE7.yvP6', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (25, 5, 'Mahasiswa 07', 'mhs07@kampus.ac.id', NULL, '$2y$12$sssqMkdUTtEq43jz2OkDU.2rEtY/xNAEuqGI4sd6ejw8j3kCVgJM.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (26, 5, 'Mahasiswa 08', 'mhs08@kampus.ac.id', NULL, '$2y$12$47odWfZDlWWWdLScbcpOBui.dNmwe7d5vK2LmXGB1MhqSzSHCalcG', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (27, 5, 'Mahasiswa 09', 'mhs09@kampus.ac.id', NULL, '$2y$12$orMiosXFS8d8TA5RdUMwNOI7kCHUwTE.X/BrWxPuJ3rlk3HHYlY3.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (28, 5, 'Mahasiswa 10', 'mhs10@kampus.ac.id', NULL, '$2y$12$EvMZ42S7isRxZA6jicDafO.pWpnuDNQvsKM2ROtz50na5MM3CiyIK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (29, 5, 'Mahasiswa 11', 'mhs11@kampus.ac.id', NULL, '$2y$12$VmKdin10fc6n2uCuwUc9QeX3soG.QshAqLj7dZqUuq60.tSawJ1y2', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (30, 5, 'Mahasiswa 12', 'mhs12@kampus.ac.id', NULL, '$2y$12$RIYF1O/ZRYwcdNiN.AEefOYfo5pd.Xw9Wtyz6/5NX38mhmi/TF4q2', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (31, 5, 'Mahasiswa 13', 'mhs13@kampus.ac.id', NULL, '$2y$12$g1kCoPWsQSHSKLzzKDtLM.xrW8LLwGMhXR6RfxVLm20DCEw7uMUYe', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (32, 5, 'Mahasiswa 14', 'mhs14@kampus.ac.id', NULL, '$2y$12$uu3p2OKOwideiMVK5VFHpeyIehJYNks4eM9own2Zcjv0QGFEas17.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (33, 5, 'Mahasiswa 15', 'mhs15@kampus.ac.id', NULL, '$2y$12$u4LAW1mhlM7IuU58y/ZMT.thpZS56k8.fvXqsjVasDrklMuv7W9Hq', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (34, 5, 'Mahasiswa 16', 'mhs16@kampus.ac.id', NULL, '$2y$12$VG3rMwcV2ad3mRurrQnvH.NaC1uPF2PhfphCwcs3vtGIOmR4JITnu', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (35, 5, 'Mahasiswa 17', 'mhs17@kampus.ac.id', NULL, '$2y$12$8TQdOgJoIomtBbsF9TQ4y.KI8IKpcAaGT11jGptQkDD6Py6uoN/PO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (36, 5, 'Mahasiswa 18', 'mhs18@kampus.ac.id', NULL, '$2y$12$wfpHBoC96efwScXZeKmUqOlAtnFRFNIhfiPn6k8MpQ3P4wjGM9ygK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (37, 5, 'Mahasiswa 19', 'mhs19@kampus.ac.id', NULL, '$2y$12$kB0/C/f3cXJv/wtYQleS1ui6BaYLCmABNHrbiFHb3jzYvhXn.w3pe', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (38, 5, 'Mahasiswa 20', 'mhs20@kampus.ac.id', NULL, '$2y$12$bgagF7MwLvCUwFmEtYhoZ.5iY9QlbwWCkcRHgFma73Eh6a4NpnvWy', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (39, 5, 'Mahasiswa 21', 'mhs21@kampus.ac.id', NULL, '$2y$12$BT71ZKFeNJGw6f.4T2Hu4eTKUEGKs82YdggDzNmTYgrSO/zFM9m9e', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (40, 5, 'Mahasiswa 22', 'mhs22@kampus.ac.id', NULL, '$2y$12$Vjj/TeNM8CAdYX34rNFzMubVtvRAou6hLUrIF6NVbwQK2.xt0SKyW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (41, 5, 'Mahasiswa 23', 'mhs23@kampus.ac.id', NULL, '$2y$12$0qFABBWkUkLxaCQ2AgYwF.iazGPojXGy/OQHP2qZwa/Tz.0NwoICO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (42, 5, 'Mahasiswa 24', 'mhs24@kampus.ac.id', NULL, '$2y$12$esPkTSyMUJHhQuzpLU8dp.28DkHeFBJ6TB0iVw3rigLvJ54SmBLZW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
-INSERT INTO `users` VALUES (43, 5, 'Mahasiswa 25', 'mhs25@kampus.ac.id', NULL, '$2y$12$sK8kJOhhmejvxcEXN4vgIuIadfHiw3iKa/W64nXVZWsydjOvlCUx6', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-09 18:11:39');
+INSERT INTO `users` VALUES (4, 4, 'Dosen Budi Santoso', 'budi.santoso@kampus.ac.id', NULL, '$2y$12$3EH7R5ljPTlz/hOjC0egxuI5/O0SKu7tWWnB/5DHmXhxkq.IrKdAi', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (5, 4, 'Dosen Siti Rahmawati', 'siti.rahmawati@kampus.ac.id', NULL, '$2y$12$Igup4S2AolAqpSV7JqLi0OI5X3.ReBiYFLXxGeXEP9X.Itkw9azgu', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (6, 4, 'Dosen Agus Pratama', 'agus.pratama@kampus.ac.id', NULL, '$2y$12$BkYdXF7magjuMo4YQpLlLu12cig8St1nS/f9f1FuHnR9e0BJuhCKW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (7, 4, 'Dosen Rina Kurniawati', 'rina.kurniawati@kampus.ac.id', NULL, '$2y$12$O9iaA0IqG750.XTkZkEMOe63/yCICFPbZ6ob9xI4xQ7UMyqAKgu0a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (8, 4, 'Dosen Dedi Haryanto', 'dedi.haryanto@kampus.ac.id', NULL, '$2y$12$POTRHj7km9UoTUuUTk1sdekmXyk9MXjJCtNPP.oWuxrFT4gOVleQK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (9, 4, 'Dosen Maya Lestari', 'maya.lestari@kampus.ac.id', NULL, '$2y$12$rKkGpAHhY2kLHsz8FTGcdOcjADnnOoPNCtOfcTDTPBU.e6aMS709y', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (10, 4, 'Dosen Andi Saputra', 'andi.saputra@kampus.ac.id', NULL, '$2y$12$h.4f/m1Qo7Nu0vpu5LZ6s.xN.wgsS/YKSrQF9vcCMlgHU.Y85V2rC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (11, 4, 'Dosen Nina Marlina', 'nina.marlina@kampus.ac.id', NULL, '$2y$12$TIAF1ks4qeOjlpPCrjLbe.8millnryWVGkUCQap9g.FnrvZYWzSDm', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (12, 4, 'Dosen Rizky Maulana', 'rizky.maulana@kampus.ac.id', NULL, '$2y$12$AG.34JZ3ti102hIC24K54uHayQ50ClBOcZqsrL0MV9mHLxC4VxiyW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (13, 4, 'Dosen Wulan Sari', 'wulan.sari@kampus.ac.id', NULL, '$2y$12$SiOxfAh27b08oURgee7rKOyt90XBr7BtPO2xZlPXKLbnZ6tGCMBDi', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (14, 4, 'Dosen Farhan Akbar', 'farhan.akbar@kampus.ac.id', NULL, '$2y$12$dofk3NjhJ3koheb653ahNeSvxQUUsSB9/.Ex2F5uETz8bmmkAYXfO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (15, 4, 'Dosen Intan Permata', 'intan.permata@kampus.ac.id', NULL, '$2y$12$g/AWMexuCZmYR/Oo5hbkDuOP1F5Itgg63oSOLUwwzWLZJLqoYlY5K', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (16, 4, 'Dosen Yusuf Nugroho', 'yusuf.nugroho@kampus.ac.id', NULL, '$2y$12$rCCI274aYx0NWCi1JyxUROd26IUKCoAG4bTVZPppOzRvhFj7b8jkG', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (17, 4, 'Dosen Citra Anggraini', 'citra.anggraini@kampus.ac.id', NULL, '$2y$12$ZVuJcUxKaY/WrCkXHgBYEuyr459iekHv04Q.pOrjTu.HV7U8fFoPS', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (18, 4, 'Dosen Arif Setiawan', 'arif.setiawan@kampus.ac.id', NULL, '$2y$12$E3ejhjItivOwGldhq2NdA.lfE83udi0fXlyOVSZbYCMt0Cu/W913a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (19, 5, 'Mahasiswa Aldi Ramadhan', 'aldi.ramadhan@kampus.ac.id', NULL, '$2y$12$2z/KVWJQQ/C1yUc4YH/px.bg8YhL/KH/.yxviAgUuc96I08qQqg8a', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (20, 5, 'Mahasiswa Nabila Putri', 'nabila.putri@kampus.ac.id', NULL, '$2y$12$HRwxXkElqAMOQ/iJieXos.rp6J4JvmnWfZILJAIbq5iwPFEUS..AO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (21, 5, 'Mahasiswa Fajar Hidayat', 'fajar.hidayat@kampus.ac.id', NULL, '$2y$12$Cy/fM98UA0pZZcSP0/57N./pB4gbF771hpH1fJCGaqxabIAXaJrmm', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (22, 5, 'Mahasiswa Dinda Aulia', 'dinda.aulia@kampus.ac.id', NULL, '$2y$12$JEqL2o0ngnnzqBk1EhfWme/4Rzt6y98.PWj64n/jYWvryU017BbIC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (23, 5, 'Mahasiswa Rafi Kurniawan', 'rafi.kurniawan@kampus.ac.id', NULL, '$2y$12$E9IypC5wGAKFDnyXnSD/Ue5ZUNKfFx.AfoPbqoWBq3ASFrlca9ZVC', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (24, 5, 'Mahasiswa Nadya Safitri', 'nadya.safitri@kampus.ac.id', NULL, '$2y$12$hP87xLA9Y2DjcinGVZtmAeegdOdbciKmHrbsUunekpgQcnE7.yvP6', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (25, 5, 'Mahasiswa Iqbal Prakoso', 'iqbal.prakoso@kampus.ac.id', NULL, '$2y$12$sssqMkdUTtEq43jz2OkDU.2rEtY/xNAEuqGI4sd6ejw8j3kCVgJM.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (26, 5, 'Mahasiswa Salsa Oktaviani', 'salsa.oktaviani@kampus.ac.id', NULL, '$2y$12$47odWfZDlWWWdLScbcpOBui.dNmwe7d5vK2LmXGB1MhqSzSHCalcG', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (27, 5, 'Mahasiswa Bagas Wicaksono', 'bagas.wicaksono@kampus.ac.id', NULL, '$2y$12$orMiosXFS8d8TA5RdUMwNOI7kCHUwTE.X/BrWxPuJ3rlk3HHYlY3.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (28, 5, 'Mahasiswa Tiara Maharani', 'tiara.maharani@kampus.ac.id', NULL, '$2y$12$EvMZ42S7isRxZA6jicDafO.pWpnuDNQvsKM2ROtz50na5MM3CiyIK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (29, 5, 'Mahasiswa Raka Saputro', 'raka.saputro@kampus.ac.id', NULL, '$2y$12$VmKdin10fc6n2uCuwUc9QeX3soG.QshAqLj7dZqUuq60.tSawJ1y2', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (30, 5, 'Mahasiswa Alya Nurfadila', 'alya.nurfadila@kampus.ac.id', NULL, '$2y$12$RIYF1O/ZRYwcdNiN.AEefOYfo5pd.Xw9Wtyz6/5NX38mhmi/TF4q2', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (31, 5, 'Mahasiswa Galih Pranata', 'galih.pranata@kampus.ac.id', NULL, '$2y$12$g1kCoPWsQSHSKLzzKDtLM.xrW8LLwGMhXR6RfxVLm20DCEw7uMUYe', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (32, 5, 'Mahasiswa Syifa Khairunnisa', 'syifa.khairunnisa@kampus.ac.id', NULL, '$2y$12$uu3p2OKOwideiMVK5VFHpeyIehJYNks4eM9own2Zcjv0QGFEas17.', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (33, 5, 'Mahasiswa Fikri Ananda', 'fikri.ananda@kampus.ac.id', NULL, '$2y$12$u4LAW1mhlM7IuU58y/ZMT.thpZS56k8.fvXqsjVasDrklMuv7W9Hq', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (34, 5, 'Mahasiswa Dewi Larasati', 'dewi.larasati@kampus.ac.id', NULL, '$2y$12$VG3rMwcV2ad3mRurrQnvH.NaC1uPF2PhfphCwcs3vtGIOmR4JITnu', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (35, 5, 'Mahasiswa Ilham Nugraha', 'ilham.nugraha@kampus.ac.id', NULL, '$2y$12$8TQdOgJoIomtBbsF9TQ4y.KI8IKpcAaGT11jGptQkDD6Py6uoN/PO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (36, 5, 'Mahasiswa Putri Cahyani', 'putri.cahyani@kampus.ac.id', NULL, '$2y$12$wfpHBoC96efwScXZeKmUqOlAtnFRFNIhfiPn6k8MpQ3P4wjGM9ygK', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (37, 5, 'Mahasiswa Hendra Wijaya', 'hendra.wijaya@kampus.ac.id', NULL, '$2y$12$kB0/C/f3cXJv/wtYQleS1ui6BaYLCmABNHrbiFHb3jzYvhXn.w3pe', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (38, 5, 'Mahasiswa Rani Puspitasari', 'rani.puspitasari@kampus.ac.id', NULL, '$2y$12$bgagF7MwLvCUwFmEtYhoZ.5iY9QlbwWCkcRHgFma73Eh6a4NpnvWy', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (39, 5, 'Mahasiswa Dimas Mahendra', 'dimas.mahendra@kampus.ac.id', NULL, '$2y$12$BT71ZKFeNJGw6f.4T2Hu4eTKUEGKs82YdggDzNmTYgrSO/zFM9m9e', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (40, 5, 'Mahasiswa Anisa Fauziah', 'anisa.fauziah@kampus.ac.id', NULL, '$2y$12$Vjj/TeNM8CAdYX34rNFzMubVtvRAou6hLUrIF6NVbwQK2.xt0SKyW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (41, 5, 'Mahasiswa Rizal Firmansyah', 'rizal.firmansyah@kampus.ac.id', NULL, '$2y$12$0qFABBWkUkLxaCQ2AgYwF.iazGPojXGy/OQHP2qZwa/Tz.0NwoICO', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (42, 5, 'Mahasiswa Nisa Amelia', 'nisa.amelia@kampus.ac.id', NULL, '$2y$12$esPkTSyMUJHhQuzpLU8dp.28DkHeFBJ6TB0iVw3rigLvJ54SmBLZW', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
+INSERT INTO `users` VALUES (43, 5, 'Mahasiswa Yoga Pratama', 'yoga.pratama@kampus.ac.id', NULL, '$2y$12$sK8kJOhhmejvxcEXN4vgIuIadfHiw3iKa/W64nXVZWsydjOvlCUx6', 'aktif', NULL, '2026-03-09 18:11:39', '2026-03-10 03:37:37');
 
 SET FOREIGN_KEY_CHECKS = 1;
