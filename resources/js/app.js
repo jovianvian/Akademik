@@ -207,6 +207,61 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('[data-table-skeleton]').forEach((el) => el.classList.add('hidden'));
     }, 280);
 
+    const resolveTableNumberStart = (table) => {
+        const tableScope = table.closest('.table-wrap')?.parentElement || table.parentElement || table;
+        const scope = table.closest('article, section, main, .card-panel, body') || document;
+        const localText = tableScope.textContent || '';
+        const scopeText = scope.textContent || '';
+        const showingMatch = localText.match(/Showing\s+(\d+)\s+to\s+\d+\s+of\s+\d+\s+results?/i)
+            || scopeText.match(/Showing\s+(\d+)\s+to\s+\d+\s+of\s+\d+\s+results?/i);
+        if (showingMatch) {
+            return Number(showingMatch[1]);
+        }
+
+        const tableId = table.id;
+        const params = new URLSearchParams(window.location.search);
+        let pageParamName = 'page';
+
+        if (tableId) {
+            const linkedInput = document.querySelector(`[data-live-search-target="#${tableId}"]`);
+            if (linkedInput?.dataset.pageParam) {
+                pageParamName = linkedInput.dataset.pageParam;
+            }
+        }
+
+        const page = Number(params.get(pageParamName) || 1);
+        if (!Number.isFinite(page) || page <= 1) {
+            return 1;
+        }
+
+        const dataRows = Array.from(table.querySelectorAll('tbody tr')).filter((row) => row.querySelectorAll('td,th').length > 1);
+        const perPage = Math.max(dataRows.length, 10);
+        return ((page - 1) * perPage) + 1;
+    };
+
+    const ensureTableFilters = () => {
+        document.querySelectorAll('.table-wrap > table, .table-wrap table.table-base').forEach((table, idx) => {
+            const wrap = table.closest('.table-wrap');
+            if (!wrap) return;
+
+            if (!table.id) {
+                table.id = `table-base-${idx + 1}`;
+            }
+
+            const hasSearch = Boolean(document.querySelector(`[data-live-search-target="#${table.id}"]`));
+            if (hasSearch) return;
+
+            if (!wrap.parentElement) return;
+            if (wrap.dataset.autoFilterAttached === '1') return;
+
+            const toolbar = document.createElement('div');
+            toolbar.className = 'filter-toolbar mb-3';
+            toolbar.innerHTML = `<input type="text" class="input-select w-full md:w-80" placeholder="Cari data..." data-live-search-target="#${table.id}">`;
+            wrap.parentElement.insertBefore(toolbar, wrap);
+            wrap.dataset.autoFilterAttached = '1';
+        });
+    };
+
     const applyTableRowNumbers = () => {
         document.querySelectorAll('table.table-base').forEach((table) => {
             if (table.dataset.numbered === '1') return;
@@ -228,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
             noTh.textContent = 'No';
             headRow.prepend(noTh);
 
-            let no = 1;
+            let no = resolveTableNumberStart(table);
             bodyRows.forEach((row) => {
                 const cells = row.querySelectorAll('td,th');
                 if (cells.length === 0) return;
@@ -250,6 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    ensureTableFilters();
     applyTableRowNumbers();
 
     const root = document.documentElement;
@@ -333,21 +389,89 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    document.querySelectorAll('[data-live-search-target]').forEach((input) => {
-        const targetSelector = input.getAttribute('data-live-search-target');
-        const table = targetSelector ? document.querySelector(targetSelector) : null;
-        if (!table) return;
+    const bindLiveSearchInputs = () => {
+        document.querySelectorAll('[data-live-search-target]').forEach((input) => {
+            if (input.dataset.liveSearchBound === '1') return;
 
-        const rows = Array.from(table.querySelectorAll('tbody tr'));
-        const onSearch = () => {
-            const query = String(input.value || '').toLowerCase().trim();
-            rows.forEach((row) => {
-                const rowText = row.textContent?.toLowerCase() ?? '';
-                row.style.display = query === '' || rowText.includes(query) ? '' : 'none';
-            });
-        };
+            const targetSelector = input.getAttribute('data-live-search-target');
+            const table = targetSelector ? document.querySelector(targetSelector) : null;
+            if (!table) return;
 
-        input.addEventListener('input', onSearch);
+            const onSearch = () => {
+                const query = String(input.value || '').toLowerCase().trim();
+                Array.from(table.querySelectorAll('tbody tr')).forEach((row) => {
+                    const rowText = row.textContent?.toLowerCase() ?? '';
+                    row.style.display = query === '' || rowText.includes(query) ? '' : 'none';
+                });
+            };
+
+            input.addEventListener('input', onSearch);
+            input.dataset.liveSearchBound = '1';
+        });
+    };
+
+    bindLiveSearchInputs();
+
+    const escapeCsvCell = (raw) => {
+        const value = String(raw ?? '').replace(/\r?\n|\r/g, ' ').trim();
+        if (!value.includes('"') && !value.includes(',') && !value.includes(';')) {
+            return value;
+        }
+        return `"${value.replace(/"/g, '""')}"`;
+    };
+
+    const getTableRowsForExport = (table) => {
+        const rows = [];
+        const headers = Array.from(table.querySelectorAll('thead th')).map((th) => th.textContent?.trim() ?? '');
+        if (headers.length > 0) {
+            rows.push(headers);
+        }
+
+        table.querySelectorAll('tbody tr').forEach((tr) => {
+            if (tr.style.display === 'none') return;
+            const cells = Array.from(tr.querySelectorAll('td,th')).map((cell) => cell.textContent?.trim() ?? '');
+            if (cells.length > 1) {
+                rows.push(cells);
+            }
+        });
+
+        return rows;
+    };
+
+    const downloadBlob = (content, filename, mimeType) => {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+    };
+
+    document.querySelectorAll('[data-table-export-target]').forEach((button) => {
+        button.addEventListener('click', () => {
+            const targetSelector = button.getAttribute('data-table-export-target');
+            const format = (button.getAttribute('data-table-export-format') || 'csv').toLowerCase();
+            const table = targetSelector ? document.querySelector(targetSelector) : null;
+            if (!table) return;
+
+            const rows = getTableRowsForExport(table);
+            if (rows.length === 0) return;
+
+            const stamp = new Date().toISOString().slice(0, 10);
+            if (format === 'excel') {
+                const tsv = rows
+                    .map((row) => row.map((cell) => String(cell ?? '').replace(/\t/g, ' ')).join('\t'))
+                    .join('\n');
+                downloadBlob(tsv, `export-${stamp}.xls`, 'application/vnd.ms-excel;charset=utf-8;');
+                return;
+            }
+
+            const csv = rows.map((row) => row.map(escapeCsvCell).join(',')).join('\n');
+            downloadBlob(csv, `export-${stamp}.csv`, 'text/csv;charset=utf-8;');
+        });
     });
 
     const sidebar = document.getElementById('sidebar');

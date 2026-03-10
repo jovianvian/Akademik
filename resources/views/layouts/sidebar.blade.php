@@ -59,6 +59,8 @@
                         <a href="{{ route('master.jabatan-dosen.index') }}" class="menu-item {{ request()->routeIs('master.jabatan-dosen.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Jabatan Dosen</a>
                     @endif
                     @if($user->hasAbility('khs.generate'))
+                        <a href="{{ route('akademik.generate-khs.index') }}" class="menu-item {{ request()->routeIs('akademik.generate-khs.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Generate KHS</a>
+                        <a href="{{ route('akademik.periode-krs.index') }}" class="menu-item {{ request()->routeIs('akademik.periode-krs.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Periode KRS</a>
                         <a href="{{ route('akademik.monitoring-krs.index') }}" class="menu-item {{ request()->routeIs('akademik.monitoring-krs.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Monitoring KRS</a>
                         <a href="{{ route('akademik.nilai-mahasiswa.index') }}" class="menu-item {{ request()->routeIs('akademik.nilai-mahasiswa.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Nilai Mahasiswa</a>
                         @if($evaluasiEnabled)
@@ -76,6 +78,7 @@
                     <a href="{{ route('keuangan.tagihan.index') }}" class="menu-item {{ request()->routeIs('keuangan.tagihan.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Tagihan UKT</a>
                     <a href="{{ route('keuangan.pembayaran.index') }}" class="menu-item {{ request()->routeIs('keuangan.pembayaran.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Validasi Pembayaran</a>
                     <a href="{{ route('keuangan.monitoring-pembayaran.index') }}" class="menu-item {{ request()->routeIs('keuangan.monitoring-pembayaran.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Monitoring Pembayaran</a>
+                    <a href="{{ route('keuangan.laporan.index') }}" class="menu-item {{ request()->routeIs('keuangan.laporan.*') ? 'menu-item-active' : 'menu-item-inactive' }}">Laporan Keuangan</a>
                 </div>
             </details>
         @endif

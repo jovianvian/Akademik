@@ -6,6 +6,7 @@ use App\Support\AuditLogger;
 use App\Support\AcademicSetting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class SuperAdminController extends Controller
 {
@@ -75,6 +76,43 @@ class SuperAdminController extends Controller
         );
 
         return back()->with('success', 'Data user berhasil diperbarui.');
+    }
+
+    public function storeUser(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role_id' => ['required', 'integer', 'exists:roles,id'],
+            'status' => ['required', 'in:aktif,nonaktif'],
+        ]);
+
+        $userId = (int) DB::table('users')->insertGetId([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'role_id' => (int) $validated['role_id'],
+            'status' => $validated['status'],
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        AuditLogger::log(
+            aksi: 'Tambah user',
+            modul: 'super_admin',
+            entityType: 'users',
+            entityId: $userId,
+            konteks: [
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'role_id' => (int) $validated['role_id'],
+                'status' => $validated['status'],
+            ],
+            request: $request
+        );
+
+        return back()->with('success', 'User baru berhasil ditambahkan.');
     }
 
     public function rolePermissions()

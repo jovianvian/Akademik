@@ -8,27 +8,31 @@
     <x-admin.page-layout
         title="Validasi Pembayaran"
         description="Input dan validasi transaksi pembayaran UKT."
-        add-label="+ Tambah Validasi Pembayaran"
+        add-label="Tambah Validasi Pembayaran"
         add-target="pembayaranFormModal"
     >
         <x-slot:toolbar>
             <form method="GET" action="{{ route('keuangan.pembayaran.index') }}" class="admin-toolbar">
-                <input type="text" class="input-select w-full md:w-72" placeholder="Search mahasiswa/periode..." data-live-search-target="#pembayaranTable">
-                <select name="tahun_akademik_id" class="input-select">
-                    <option value="">Semua periode</option>
-                    @foreach($tahunAkademikList as $ta)
-                        <option value="{{ $ta->id }}" @selected((string) $selectedTahunAkademikId === (string) $ta->id)>
-                            {{ $ta->tahun }} {{ ucfirst($ta->semester) }}
-                        </option>
-                    @endforeach
-                </select>
-                <input type="date" name="date_from" class="input-select" value="{{ $dateFrom }}">
-                <input type="date" name="date_to" class="input-select" value="{{ $dateTo }}">
-                <input type="hidden" name="sort_by" value="{{ $sortBy }}">
-                <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
-                <button class="btn-compact" type="submit">Filter</button>
-                <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-secondary">Export CSV</a>
-                <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-secondary">Export Excel</a>
+                <input type="text" class="input-select" placeholder="Search mahasiswa/periode..." data-live-search-target="#pembayaranTable" data-toolbar-search>
+                <div data-toolbar-right>
+                    <div data-toolbar-form>
+                        <select name="tahun_akademik_id" class="input-select">
+                            <option value="">Semua periode</option>
+                            @foreach($tahunAkademikList as $ta)
+                                <option value="{{ $ta->id }}" @selected((string) $selectedTahunAkademikId === (string) $ta->id)>
+                                    {{ $ta->tahun }} {{ ucfirst($ta->semester) }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="date" name="date_from" class="input-select" value="{{ $dateFrom }}">
+                        <input type="date" name="date_to" class="input-select" value="{{ $dateTo }}">
+                        <input type="hidden" name="sort_by" value="{{ $sortBy }}">
+                        <input type="hidden" name="sort_dir" value="{{ $sortDir }}">
+                        <button class="btn-compact" type="submit">Filter</button>
+                    </div>
+                    <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-secondary">Export CSV</a>
+                    <a href="{{ route('keuangan.pembayaran.export', ['tahun_akademik_id' => $selectedTahunAkademikId, 'date_from' => $dateFrom, 'date_to' => $dateTo, 'sort_by' => $sortBy, 'sort_dir' => $sortDir]) }}" class="btn-secondary">Export Excel</a>
+                </div>
             </form>
         </x-slot:toolbar>
 

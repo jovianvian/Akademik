@@ -4,7 +4,7 @@
     <x-admin.page-layout
         title="Master Jabatan Dosen"
         description="Kelola struktur jabatan dan periode aktif dosen."
-        add-label="+ Tambah Jabatan Dosen"
+        add-label="Tambah Jabatan Dosen"
         add-target="jabatanDosenFormModal"
     >
         <x-slot:toolbar>

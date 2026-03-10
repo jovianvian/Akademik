@@ -182,12 +182,59 @@ class DatabaseSeeder extends Seeder
             ],
         ]);
 
+        $dosenNames = [
+            'Budi Santoso',
+            'Siti Rahmawati',
+            'Agus Pratama',
+            'Rina Kurniawati',
+            'Dedi Haryanto',
+            'Maya Lestari',
+            'Andi Saputra',
+            'Nina Marlina',
+            'Rizky Maulana',
+            'Wulan Sari',
+            'Farhan Akbar',
+            'Intan Permata',
+            'Yusuf Nugroho',
+            'Citra Anggraini',
+            'Arif Setiawan',
+        ];
+
+        $mahasiswaNames = [
+            'Aldi Ramadhan',
+            'Nabila Putri',
+            'Fajar Hidayat',
+            'Dinda Aulia',
+            'Rafi Kurniawan',
+            'Nadya Safitri',
+            'Iqbal Prakoso',
+            'Salsa Oktaviani',
+            'Bagas Wicaksono',
+            'Tiara Maharani',
+            'Raka Saputro',
+            'Alya Nurfadila',
+            'Galih Pranata',
+            'Syifa Khairunnisa',
+            'Fikri Ananda',
+            'Dewi Larasati',
+            'Ilham Nugraha',
+            'Putri Cahyani',
+            'Hendra Wijaya',
+            'Rani Puspitasari',
+            'Dimas Mahendra',
+            'Anisa Fauziah',
+            'Rizal Firmansyah',
+            'Nisa Amelia',
+            'Yoga Pratama',
+        ];
+
         $dosenUsers = [];
         for ($i = 1; $i <= 15; $i++) {
+            $name = $dosenNames[$i - 1] ?? ('Dosen '.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
             $dosenUsers[] = DB::table('users')->insertGetId([
                 'role_id' => $roles['dosen'],
-                'name' => 'Dosen '.str_pad((string) $i, 2, '0', STR_PAD_LEFT),
-                'email' => 'dosen'.str_pad((string) $i, 2, '0', STR_PAD_LEFT).'@kampus.ac.id',
+                'name' => $name,
+                'email' => $this->makeInstitutionalEmail($name, 'dosen', $i),
                 'password' => Hash::make('password'),
                 'status' => 'aktif',
                 'created_at' => $now,
@@ -197,10 +244,11 @@ class DatabaseSeeder extends Seeder
 
         $mahasiswaUsers = [];
         for ($i = 1; $i <= 25; $i++) {
+            $name = $mahasiswaNames[$i - 1] ?? ('Mahasiswa '.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
             $mahasiswaUsers[] = DB::table('users')->insertGetId([
                 'role_id' => $roles['mahasiswa'],
-                'name' => 'Mahasiswa '.str_pad((string) $i, 2, '0', STR_PAD_LEFT),
-                'email' => 'mhs'.str_pad((string) $i, 2, '0', STR_PAD_LEFT).'@kampus.ac.id',
+                'name' => $name,
+                'email' => $this->makeInstitutionalEmail($name, 'mhs', $i),
                 'password' => Hash::make('password'),
                 'status' => 'aktif',
                 'created_at' => $now,
@@ -211,9 +259,10 @@ class DatabaseSeeder extends Seeder
         $dosenIds = [];
         foreach ($dosenUsers as $index => $userId) {
             $num = $index + 1;
+            $name = $dosenNames[$index] ?? ('Dosen '.str_pad((string) $num, 2, '0', STR_PAD_LEFT));
             $dosenIds[] = DB::table('dosen')->insertGetId([
                 'nidn' => '1987'.str_pad((string) $num, 6, '0', STR_PAD_LEFT),
-                'nama' => 'Dosen '.str_pad((string) $num, 2, '0', STR_PAD_LEFT),
+                'nama' => $name,
                 'prodi_id' => ($index % 4) + 1,
                 'user_id' => $userId,
                 'created_at' => $now,
@@ -278,9 +327,11 @@ class DatabaseSeeder extends Seeder
             };
             $enrollment = $statusMahasiswa === 'dropout' ? 'do' : $statusMahasiswa;
 
+            $name = $mahasiswaNames[$i - 1] ?? ('Mahasiswa '.str_pad((string) $i, 2, '0', STR_PAD_LEFT));
+
             $mahasiswaIds[] = DB::table('mahasiswa')->insertGetId([
                 'nim' => '23'.str_pad((string) (10000 + $i), 6, '0', STR_PAD_LEFT),
-                'nama' => 'Mahasiswa '.str_pad((string) $i, 2, '0', STR_PAD_LEFT),
+                'nama' => $name,
                 'prodi_id' => (($i - 1) % 4) + 1,
                 'angkatan' => 2022 + ($i % 4),
                 'status_mahasiswa' => $statusMahasiswa,
@@ -536,6 +587,17 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => $now,
             ]);
         }
+    }
+
+    private function makeInstitutionalEmail(string $name, string $fallbackPrefix, int $index): string
+    {
+        $base = strtolower(trim((string) preg_replace('/[^a-z0-9]+/i', '.', $name), '.'));
+        $base = preg_replace('/\.{2,}/', '.', $base) ?: '';
+        if ($base === '') {
+            $base = $fallbackPrefix.str_pad((string) $index, 2, '0', STR_PAD_LEFT);
+        }
+
+        return $base.'@kampus.ac.id';
     }
 
     private function toHuruf(float $angka): string

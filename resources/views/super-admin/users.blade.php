@@ -3,7 +3,13 @@
 @section('content')
     <section class="grid grid-cols-12 gap-4 md:gap-6">
         <article class="card-panel col-span-12">
-            <h2 class="text-base font-semibold text-gray-900">Kelola User dan Role</h2>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <h2 class="text-base font-semibold text-gray-900">Kelola User dan Role</h2>
+                <button type="button" class="btn-primary" data-modal-open="userFormModal">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span class="ml-2">Tambah User</span>
+                </button>
+            </div>
             @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
             @if($errors->any()) <p class="mt-3 text-sm text-error-600">{{ $errors->first() }}</p> @endif
             <div class="filter-toolbar mt-3">
@@ -56,6 +62,66 @@
             <div class="mt-3">{{ $items->links() }}</div>
         </article>
     </section>
+
+    <x-admin.resource-form-modal
+        id="userFormModal"
+        title="Tambah User"
+        action="{{ route('super-admin.users.store') }}"
+        method="POST"
+        submit-label="Simpan User"
+        size="max-w-2xl"
+    >
+        <input
+            type="text"
+            name="name"
+            class="input-text"
+            placeholder="Nama lengkap"
+            value="{{ old('name') }}"
+            required
+        >
+        <input
+            type="email"
+            name="email"
+            class="input-text"
+            placeholder="Email"
+            value="{{ old('email') }}"
+            required
+        >
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <input type="password" name="password" class="input-text" placeholder="Password (min. 8 karakter)" required>
+            <input type="password" name="password_confirmation" class="input-text" placeholder="Konfirmasi password" required>
+        </div>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <select name="role_id" class="input-text" required>
+                <option value="">Pilih role</option>
+                @foreach($roles as $role)
+                    <option value="{{ $role->id }}" @selected((string) old('role_id') === (string) $role->id)>{{ $role->role_name }}</option>
+                @endforeach
+            </select>
+            <select name="status" class="input-text" required>
+                <option value="aktif" @selected(old('status', 'aktif') === 'aktif')>aktif</option>
+                <option value="nonaktif" @selected(old('status') === 'nonaktif')>nonaktif</option>
+            </select>
+        </div>
+        @error('name') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('email') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('password') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('role_id') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+        @error('status') <p class="text-sm text-error-600">{{ $message }}</p> @enderror
+    </x-admin.resource-form-modal>
 @endsection
 
+@push('scripts')
+    <script>
+        (function () {
+            @if($errors->any() && old('_modal') === 'userFormModal')
+                const modal = document.getElementById('userFormModal');
+                if (modal) {
+                    modal.classList.remove('hidden');
+                    modal.classList.add('open');
+                }
+            @endif
+        })();
+    </script>
+@endpush
 

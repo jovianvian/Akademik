@@ -6,10 +6,14 @@
             <h2 class="text-base font-semibold text-gray-900">Generate / Finalisasi KHS</h2>
             @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
             @if($errors->has('khs')) <p class="mt-3 text-sm text-error-600">{{ $errors->first('khs') }}</p> @endif
+            @php
+                $rowNumberStart = $items->firstItem() ?? 1;
+            @endphp
             <div class="mt-4 table-wrap">
                 <table class="table-base">
                     <thead class="bg-gray-50">
                     <tr>
+                        <th class="px-4 py-3 text-left" style="width: 8%;">No</th>
                         <th class="px-4 py-3 text-left" style="width: 24%;">Mahasiswa</th>
                         <th class="px-4 py-3 text-left" style="width: 14%;">Periode</th>
                         <th class="px-4 py-3 text-left" style="width: 13%;">Status KRS</th>
@@ -19,8 +23,9 @@
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                    @forelse($items as $item)
+                    @forelse($items as $index => $item)
                         <tr>
+                            <td class="px-4 py-3">{{ $rowNumberStart + $index }}</td>
                             <td class="px-4 py-3">{{ $item->nim }} - {{ $item->nama }}</td>
                             <td class="px-4 py-3">{{ $item->tahun }} {{ ucfirst($item->semester) }}</td>
                             <td class="px-4 py-3">{{ strtoupper($item->status_krs) }}</td>
@@ -49,7 +54,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="px-4 py-3 text-gray-500">Belum ada data KRS.</td></tr>
+                        <tr><td colspan="7" class="px-4 py-3 text-gray-500">Belum ada data KRS.</td></tr>
                     @endforelse
                     </tbody>
                 </table>
@@ -58,5 +63,4 @@
         </article>
     </section>
 @endsection
-
 

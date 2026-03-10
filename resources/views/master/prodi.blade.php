@@ -4,7 +4,7 @@
     <x-admin.page-layout
         title="Master Program Studi"
         description="Kelola program studi dan pemetaan fakultas."
-        add-label="+ Tambah Prodi"
+        add-label="Tambah Prodi"
         add-target="prodiFormModal"
     >
         <x-slot:toolbar>

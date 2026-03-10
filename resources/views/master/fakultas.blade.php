@@ -4,7 +4,7 @@
     <x-admin.page-layout
         title="Master Fakultas"
         description="Kelola data fakultas secara terpusat."
-        add-label="+ Tambah Fakultas"
+        add-label="Tambah Fakultas"
         add-target="fakultasFormModal"
     >
         <x-slot:toolbar>

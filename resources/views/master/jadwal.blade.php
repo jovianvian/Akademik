@@ -4,7 +4,7 @@
     <x-admin.page-layout
         title="Master Jadwal"
         description="Kelola jadwal perkuliahan aktif."
-        add-label="+ Tambah Jadwal"
+        add-label="Tambah Jadwal"
         add-target="jadwalFormModal"
     >
         <x-slot:toolbar>

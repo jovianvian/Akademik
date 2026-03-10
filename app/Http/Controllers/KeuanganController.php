@@ -224,6 +224,24 @@ class KeuanganController extends Controller
         ]);
     }
 
+    public function laporan(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $dateFrom = $request->query('date_from');
+        $dateTo = $request->query('date_to');
+
+        $dataset = $this->buildLaporanDataset($tahunAkademikId, $dateFrom, $dateTo);
+
+        return view('keuangan.laporan', [
+            'title' => 'Laporan Keuangan',
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            ...$dataset,
+        ]);
+    }
+
     public function storePembayaran(Request $request)
     {
         $validated = $request->validate([
@@ -388,5 +406,127 @@ class KeuanganController extends Controller
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download('pembayaran-ukt-'.now()->format('YmdHis').'.pdf');
+    }
+
+    public function exportLaporanCsv(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $dateFrom = $request->query('date_from');
+        $dateTo = $request->query('date_to');
+
+        $dataset = $this->buildLaporanDataset($tahunAkademikId, $dateFrom, $dateTo);
+        $rows = $dataset['rows'];
+
+        $filename = 'laporan-keuangan-'.now()->format('YmdHis').'.csv';
+        return response()->streamDownload(function () use ($rows, $dataset) {
+            $out = fopen('php://output', 'w');
+            fputcsv($out, ['Ringkasan', 'Nilai']);
+            fputcsv($out, ['Total Tagihan', $dataset['summary']['total_tagihan']]);
+            fputcsv($out, ['Total Pembayaran', $dataset['summary']['total_pembayaran']]);
+            fputcsv($out, ['Sisa Tagihan', $dataset['summary']['total_sisa']]);
+            fputcsv($out, []);
+            fputcsv($out, ['Periode', 'Jumlah Tagihan', 'Total Tagihan', 'Total Pembayaran', 'Sisa']);
+            foreach ($rows as $row) {
+                fputcsv($out, [
+                    $row->tahun.' / '.strtoupper($row->semester),
+                    $row->jumlah_tagihan,
+                    $row->total_tagihan,
+                    $row->total_pembayaran,
+                    $row->total_sisa,
+                ]);
+            }
+            fclose($out);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
+    public function exportLaporanPdf(Request $request)
+    {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $dateFrom = $request->query('date_from');
+        $dateTo = $request->query('date_to');
+
+        $dataset = $this->buildLaporanDataset($tahunAkademikId, $dateFrom, $dateTo);
+
+        $pdf = Pdf::loadView('pdf.laporan-keuangan', [
+            'rows' => $dataset['rows'],
+            'summary' => $dataset['summary'],
+            'statusCounts' => $dataset['statusCounts'],
+            'generatedAt' => now()->format('Y-m-d H:i:s'),
+            'docMeta' => PdfDocumentMeta::build('laporan_keuangan'),
+            'filters' => [
+                'tahun_akademik_id' => $tahunAkademikId,
+                'date_from' => $dateFrom,
+                'date_to' => $dateTo,
+            ],
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('laporan-keuangan-'.now()->format('YmdHis').'.pdf');
+    }
+
+    private function buildLaporanDataset($tahunAkademikId, $dateFrom, $dateTo): array
+    {
+        $paymentSubQuery = DB::table('pembayaran')
+            ->select('tagihan_id', DB::raw('SUM(jumlah_bayar) as total_bayar'))
+            ->groupBy('tagihan_id');
+
+        if ($dateFrom) {
+            $paymentSubQuery->whereDate('tanggal_bayar', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $paymentSubQuery->whereDate('tanggal_bayar', '<=', $dateTo);
+        }
+
+        $baseQuery = DB::table('tagihan_ukt as t')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 't.tahun_akademik_id')
+            ->leftJoinSub($paymentSubQuery, 'pay', function ($join) {
+                $join->on('pay.tagihan_id', '=', 't.id');
+            });
+
+        if ($tahunAkademikId) {
+            $baseQuery->where('t.tahun_akademik_id', $tahunAkademikId);
+        }
+
+        $summaryRow = (clone $baseQuery)
+            ->selectRaw('COALESCE(SUM(t.jumlah), 0) as total_tagihan')
+            ->selectRaw('COALESCE(SUM(COALESCE(pay.total_bayar, 0)), 0) as total_pembayaran')
+            ->first();
+
+        $totalTagihan = (float) ($summaryRow->total_tagihan ?? 0);
+        $totalPembayaran = (float) ($summaryRow->total_pembayaran ?? 0);
+        $totalSisa = max($totalTagihan - $totalPembayaran, 0);
+
+        $statusCounts = (clone $baseQuery)
+            ->select('t.status', DB::raw('COUNT(*) as total'))
+            ->groupBy('t.status')
+            ->pluck('total', 't.status');
+
+        $rows = (clone $baseQuery)
+            ->select('ta.tahun', 'ta.semester')
+            ->selectRaw('COUNT(t.id) as jumlah_tagihan')
+            ->selectRaw('COALESCE(SUM(t.jumlah), 0) as total_tagihan')
+            ->selectRaw('COALESCE(SUM(COALESCE(pay.total_bayar, 0)), 0) as total_pembayaran')
+            ->groupBy('ta.tahun', 'ta.semester')
+            ->orderByDesc('ta.id')
+            ->get()
+            ->map(function ($row) {
+                $row->total_sisa = max((float) $row->total_tagihan - (float) $row->total_pembayaran, 0);
+                return $row;
+            });
+
+        return [
+            'rows' => $rows,
+            'summary' => [
+                'total_tagihan' => $totalTagihan,
+                'total_pembayaran' => $totalPembayaran,
+                'total_sisa' => $totalSisa,
+            ],
+            'statusCounts' => [
+                'open' => (int) ($statusCounts['open'] ?? 0),
+                'partial' => (int) ($statusCounts['partial'] ?? 0),
+                'paid' => (int) ($statusCounts['paid'] ?? 0),
+                'disputed' => (int) ($statusCounts['disputed'] ?? 0),
+                'void' => (int) ($statusCounts['void'] ?? 0),
+            ],
+        ];
     }
 }

@@ -74,6 +74,9 @@ Route::middleware(['auth', 'session.login'])->group(function () {
         Route::get('/pembayaran', [KeuanganController::class, 'pembayaran'])->middleware('ability:keuangan.view')->name('pembayaran.index');
         Route::post('/pembayaran', [KeuanganController::class, 'storePembayaran'])->middleware('ability:keuangan.manage')->name('pembayaran.store');
         Route::get('/monitoring-pembayaran', [KeuanganController::class, 'monitoringPembayaran'])->middleware('ability:keuangan.view')->name('monitoring-pembayaran.index');
+        Route::get('/laporan', [KeuanganController::class, 'laporan'])->middleware('ability:keuangan.view')->name('laporan.index');
+        Route::get('/laporan/export', [KeuanganController::class, 'exportLaporanCsv'])->middleware('ability:keuangan.view')->name('laporan.export');
+        Route::get('/laporan/export-pdf', [KeuanganController::class, 'exportLaporanPdf'])->middleware('ability:keuangan.view')->name('laporan.export-pdf');
         Route::get('/pembayaran/export', [KeuanganController::class, 'exportPembayaranCsv'])->middleware('ability:keuangan.view')->name('pembayaran.export');
         Route::get('/pembayaran/export-pdf', [KeuanganController::class, 'exportPembayaranPdf'])->middleware('ability:keuangan.view')->name('pembayaran.export-pdf');
     });
@@ -115,6 +118,7 @@ Route::middleware(['auth', 'session.login'])->group(function () {
 
     Route::prefix('super-admin')->name('super-admin.')->middleware('role:super_admin')->group(function () {
         Route::get('/users', [SuperAdminController::class, 'users'])->middleware('ability:users.manage')->name('users.index');
+        Route::post('/users', [SuperAdminController::class, 'storeUser'])->middleware('ability:users.manage')->name('users.store');
         Route::patch('/users/{id}', [SuperAdminController::class, 'updateUser'])->middleware('ability:users.manage')->name('users.update');
         Route::get('/role-permissions', [SuperAdminController::class, 'rolePermissions'])->middleware('ability:roles.manage')->name('role-permissions.index');
         Route::patch('/role-permissions/{roleId}', [SuperAdminController::class, 'updateRolePermissions'])->middleware('ability:roles.manage')->name('role-permissions.update');

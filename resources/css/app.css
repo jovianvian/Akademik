@@ -139,7 +139,21 @@
 }
 
 .admin-toolbar {
-    @apply flex flex-wrap items-end justify-between gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3;
+    @apply flex flex-wrap items-end gap-3 rounded-xl border border-gray-200 bg-gray-50 p-3;
+}
+
+.admin-toolbar [data-toolbar-search] {
+    @apply w-full md:w-80;
+    margin-right: auto;
+}
+
+.admin-toolbar [data-toolbar-right] {
+    @apply flex flex-wrap items-end justify-end gap-2;
+    margin-left: auto;
+}
+
+.admin-toolbar [data-toolbar-form] {
+    @apply flex flex-wrap items-center justify-end gap-2;
 }
 
 .table-wrap {

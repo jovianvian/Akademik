@@ -4,7 +4,7 @@
     <x-admin.page-layout
         title="Master Mata Kuliah"
         description="Kelola katalog mata kuliah setiap program studi."
-        add-label="+ Tambah Mata Kuliah"
+        add-label="Tambah Mata Kuliah"
         add-target="mataKuliahFormModal"
     >
         <x-slot:toolbar>

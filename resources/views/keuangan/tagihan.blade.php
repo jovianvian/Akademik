@@ -32,7 +32,7 @@
     <x-admin.page-layout
         title="Tagihan UKT"
         description="Kelola tagihan mahasiswa dan status penagihan."
-        add-label="+ Tambah Tagihan UKT"
+        add-label="Tambah Tagihan UKT"
         add-target="tagihanFormModal"
     >
         <x-slot:toolbar>
