@@ -10,6 +10,13 @@
         <x-slot:toolbar>
             <x-admin.toolbar-filter>
                 <input type="text" class="input-select w-full md:w-80" placeholder="Search fakultas..." data-live-search-target="#fakultasTable">
+                <form method="GET" action="{{ route('master.fakultas.index') }}" class="flex items-center gap-2">
+                    <select name="sort_nama" class="input-select">
+                        <option value="asc" @selected(($selectedSortNama ?? 'asc') === 'asc')>Nama A-Z</option>
+                        <option value="desc" @selected(($selectedSortNama ?? 'asc') === 'desc')>Nama Z-A</option>
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
                 <div class="flex items-center gap-2">
                     <button type="button" class="btn-secondary" disabled>Export CSV</button>
                     <button type="button" class="btn-secondary" disabled>Export Excel</button>

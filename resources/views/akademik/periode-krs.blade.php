@@ -6,9 +6,24 @@
             <h2 class="text-base font-semibold text-gray-900">Kontrol Periode KRS</h2>
             @if(session('success')) <p class="mt-3 text-sm text-success-700">{{ session('success') }}</p> @endif
             @if($errors->any()) <p class="mt-3 text-sm text-error-600">{{ $errors->first() }}</p> @endif
+            <div class="admin-toolbar mt-3">
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search tahun akademik..." data-live-search-target="#periodeKrsTable">
+                <form method="GET" action="{{ route('akademik.periode-krs.index') }}" class="flex items-center gap-2">
+                    <select name="status_aktif" class="input-select">
+                        <option value="">Semua Status Aktif</option>
+                        <option value="1" @selected((string) ($selectedStatusAktif ?? '') === '1')>Aktif</option>
+                        <option value="0" @selected((string) ($selectedStatusAktif ?? '') === '0')>Nonaktif</option>
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
+                </div>
+            </div>
 
             <div class="mt-4 table-wrap">
-                <table class="table-base">
+                <table class="table-base" id="periodeKrsTable">
                     <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left">Tahun Akademik</th>

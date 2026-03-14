@@ -27,11 +27,19 @@ class MasterDataController extends Controller
     {
     }
 
-    public function fakultas()
+    public function fakultas(Request $request)
     {
+        $sortNama = strtolower((string) $request->query('sort_nama', 'asc')) === 'desc' ? 'desc' : 'asc';
+
+        $itemsQuery = DB::table('fakultas')
+            ->whereNull('deleted_at');
+
+        $itemsQuery->orderBy('nama_fakultas', $sortNama);
+
         return view('master.fakultas', [
             'title' => 'Master Fakultas',
-            'items' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->paginate(10)->withQueryString(),
+            'items' => $itemsQuery->paginate(10)->withQueryString(),
+            'selectedSortNama' => $sortNama,
         ]);
     }
 
@@ -122,19 +130,28 @@ class MasterDataController extends Controller
         return back()->with('success', 'Fakultas berhasil dihapus (soft delete).');
     }
 
-    public function prodi()
+    public function prodi(Request $request)
     {
+        $fakultasId = $request->query('fakultas_id');
+
+        $itemsQuery = DB::table('program_studi as p')
+            ->join('fakultas as f', 'f.id', '=', 'p.fakultas_id')
+            ->whereNull('p.deleted_at')
+            ->whereNull('f.deleted_at')
+            ->select('p.*', 'f.nama_fakultas');
+
+        if ($fakultasId) {
+            $itemsQuery->where('p.fakultas_id', $fakultasId);
+        }
+
         return view('master.prodi', [
             'title' => 'Master Program Studi',
-            'items' => DB::table('program_studi as p')
-                ->join('fakultas as f', 'f.id', '=', 'p.fakultas_id')
-                ->whereNull('p.deleted_at')
-                ->whereNull('f.deleted_at')
-                ->select('p.*', 'f.nama_fakultas')
+            'items' => $itemsQuery
                 ->orderBy('p.nama_prodi')
                 ->paginate(10)
                 ->withQueryString(),
             'fakultas' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->get(),
+            'selectedFakultasId' => $fakultasId,
         ]);
     }
 
@@ -222,19 +239,41 @@ class MasterDataController extends Controller
         return back()->with('success', 'Program studi berhasil dihapus (soft delete).');
     }
 
-    public function mataKuliah()
+    public function mataKuliah(Request $request)
     {
+        $fakultasId = $request->query('fakultas_id');
+        $prodiId = $request->query('prodi_id');
+        $semester = $request->query('semester');
+
+        $itemsQuery = DB::table('mata_kuliah as mk')
+            ->join('program_studi as p', 'p.id', '=', 'mk.prodi_id')
+            ->join('fakultas as f', 'f.id', '=', 'p.fakultas_id')
+            ->whereNull('mk.deleted_at')
+            ->whereNull('p.deleted_at')
+            ->whereNull('f.deleted_at')
+            ->select('mk.*', 'p.nama_prodi', 'f.nama_fakultas');
+
+        if ($fakultasId) {
+            $itemsQuery->where('p.fakultas_id', $fakultasId);
+        }
+        if ($prodiId) {
+            $itemsQuery->where('mk.prodi_id', $prodiId);
+        }
+        if ($semester) {
+            $itemsQuery->where('mk.semester', $semester);
+        }
+
         return view('master.mata-kuliah', [
             'title' => 'Master Mata Kuliah',
-            'items' => DB::table('mata_kuliah as mk')
-                ->join('program_studi as p', 'p.id', '=', 'mk.prodi_id')
-                ->whereNull('mk.deleted_at')
-                ->whereNull('p.deleted_at')
-                ->select('mk.*', 'p.nama_prodi')
+            'items' => $itemsQuery
                 ->orderBy('mk.kode_mk')
                 ->paginate(10)
                 ->withQueryString(),
             'prodi' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
+            'fakultas' => DB::table('fakultas')->whereNull('deleted_at')->orderBy('nama_fakultas')->get(),
+            'selectedFakultasId' => $fakultasId,
+            'selectedProdiId' => $prodiId,
+            'selectedSemester' => $semester,
         ]);
     }
 
@@ -348,17 +387,39 @@ class MasterDataController extends Controller
         return back()->with('success', 'Mata kuliah berhasil dihapus (soft delete).');
     }
 
-    public function jadwal()
+    public function jadwal(Request $request)
     {
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $prodiId = $request->query('prodi_id');
+        $dosenId = $request->query('dosen_id');
+        $hari = $request->query('hari');
+
+        $itemsQuery = DB::table('jadwal as j')
+            ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
+            ->join('program_studi as p', 'p.id', '=', 'mk.prodi_id')
+            ->join('dosen as d', 'd.id', '=', 'j.dosen_id')
+            ->join('tahun_akademik as ta', 'ta.id', '=', 'j.tahun_akademik_id')
+            ->whereNull('j.deleted_at')
+            ->whereNull('mk.deleted_at')
+            ->whereNull('p.deleted_at')
+            ->select('j.*', 'mk.kode_mk', 'mk.nama_mk', 'mk.sks', 'd.nama as nama_dosen', 'ta.tahun', 'ta.semester', 'p.nama_prodi');
+
+        if ($tahunAkademikId) {
+            $itemsQuery->where('j.tahun_akademik_id', $tahunAkademikId);
+        }
+        if ($prodiId) {
+            $itemsQuery->where('mk.prodi_id', $prodiId);
+        }
+        if ($dosenId) {
+            $itemsQuery->where('j.dosen_id', $dosenId);
+        }
+        if ($hari) {
+            $itemsQuery->where('j.hari', $hari);
+        }
+
         return view('master.jadwal', [
             'title' => 'Master Jadwal',
-            'items' => DB::table('jadwal as j')
-                ->join('mata_kuliah as mk', 'mk.id', '=', 'j.mata_kuliah_id')
-                ->join('dosen as d', 'd.id', '=', 'j.dosen_id')
-                ->join('tahun_akademik as ta', 'ta.id', '=', 'j.tahun_akademik_id')
-                ->whereNull('j.deleted_at')
-                ->whereNull('mk.deleted_at')
-                ->select('j.*', 'mk.kode_mk', 'mk.nama_mk', 'mk.sks', 'd.nama as nama_dosen', 'ta.tahun', 'ta.semester')
+            'items' => $itemsQuery
                 ->orderBy('j.hari')
                 ->orderBy('j.jam_mulai')
                 ->paginate(10)
@@ -366,6 +427,11 @@ class MasterDataController extends Controller
             'mataKuliah' => DB::table('mata_kuliah')->whereNull('deleted_at')->orderBy('kode_mk')->get(),
             'dosen' => DB::table('dosen')->orderBy('nama')->get(),
             'tahunAkademik' => DB::table('tahun_akademik')->orderByDesc('status_aktif')->orderByDesc('id')->get(),
+            'prodi' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'selectedProdiId' => $prodiId,
+            'selectedDosenId' => $dosenId,
+            'selectedHari' => $hari,
         ]);
     }
 
@@ -494,19 +560,33 @@ class MasterDataController extends Controller
         return back()->with('success', 'Jadwal berhasil dihapus (soft delete).');
     }
 
-    public function jabatanDosen()
+    public function jabatanDosen(Request $request)
     {
+        $jabatan = $request->query('jabatan');
+        $statusAktif = $request->query('status_aktif');
+
+        $itemsQuery = DB::table('jabatan_dosen as jd')
+            ->join('dosen as d', 'd.id', '=', 'jd.dosen_id')
+            ->whereNull('jd.deleted_at')
+            ->select('jd.*', 'd.nidn', 'd.nama as nama_dosen');
+
+        if ($jabatan) {
+            $itemsQuery->where('jd.jabatan', $jabatan);
+        }
+        if ($statusAktif !== null && $statusAktif !== '') {
+            $itemsQuery->where('jd.status_aktif', (int) $statusAktif);
+        }
+
         return view('master.jabatan-dosen', [
             'title' => 'Master Jabatan Dosen',
-            'items' => DB::table('jabatan_dosen as jd')
-                ->join('dosen as d', 'd.id', '=', 'jd.dosen_id')
-                ->whereNull('jd.deleted_at')
-                ->select('jd.*', 'd.nidn', 'd.nama as nama_dosen')
+            'items' => $itemsQuery
                 ->orderByDesc('jd.id')
                 ->paginate(10)
                 ->withQueryString(),
             'dosen' => DB::table('dosen')->orderBy('nama')->get(),
             'jabatanOptions' => self::JABATAN_OPTIONS,
+            'selectedJabatan' => $jabatan,
+            'selectedStatusAktif' => $statusAktif,
         ]);
     }
 

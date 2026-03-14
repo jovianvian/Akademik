@@ -11,11 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class AdminAkademikController extends Controller
 {
-    public function periodeKrs()
+    public function periodeKrs(Request $request)
     {
+        $statusAktif = $request->query('status_aktif');
+
+        $itemsQuery = DB::table('tahun_akademik');
+        if ($statusAktif !== null && $statusAktif !== '') {
+            $itemsQuery->where('status_aktif', (int) $statusAktif);
+        }
+
         return view('akademik.periode-krs', [
             'title' => 'Kontrol Periode KRS',
-            'items' => DB::table('tahun_akademik')->orderByDesc('status_aktif')->orderByDesc('id')->paginate(10)->withQueryString(),
+            'items' => $itemsQuery->orderByDesc('status_aktif')->orderByDesc('id')->paginate(10)->withQueryString(),
+            'selectedStatusAktif' => $statusAktif,
         ]);
     }
 
@@ -61,10 +69,16 @@ class AdminAkademikController extends Controller
         return back()->with('success', 'Periode KRS berhasil diperbarui.');
     }
 
-    public function generateKhs()
+    public function generateKhs(Request $request)
     {
-        $items = DB::table('krs as k')
+        $tahunAkademikId = $request->query('tahun_akademik_id');
+        $prodiId = $request->query('prodi_id');
+        $statusKrs = $request->query('status_krs');
+        $nilaiTerkunci = $request->query('nilai_terkunci');
+
+        $itemsQuery = DB::table('krs as k')
             ->join('mahasiswa as m', 'm.id', '=', 'k.mahasiswa_id')
+            ->join('program_studi as p', 'p.id', '=', 'm.prodi_id')
             ->join('tahun_akademik as ta', 'ta.id', '=', 'k.tahun_akademik_id')
             ->leftJoin('krs_detail as kd', 'kd.krs_id', '=', 'k.id')
             ->leftJoin('nilai as n', 'n.krs_detail_id', '=', 'kd.id')
@@ -72,6 +86,8 @@ class AdminAkademikController extends Controller
                 'k.id',
                 'm.nim',
                 'm.nama',
+                'm.prodi_id',
+                'p.nama_prodi',
                 'ta.tahun',
                 'ta.semester',
                 'k.status_krs',
@@ -79,7 +95,22 @@ class AdminAkademikController extends Controller
                 DB::raw('COUNT(kd.id) as total_mk'),
                 DB::raw('SUM(CASE WHEN n.id IS NOT NULL THEN 1 ELSE 0 END) as total_nilai')
             )
-            ->groupBy('k.id', 'm.nim', 'm.nama', 'ta.tahun', 'ta.semester', 'k.status_krs', 'k.nilai_terkunci')
+            ->groupBy('k.id', 'm.nim', 'm.nama', 'm.prodi_id', 'p.nama_prodi', 'ta.tahun', 'ta.semester', 'k.status_krs', 'k.nilai_terkunci');
+
+        if ($tahunAkademikId) {
+            $itemsQuery->where('k.tahun_akademik_id', $tahunAkademikId);
+        }
+        if ($prodiId) {
+            $itemsQuery->where('m.prodi_id', $prodiId);
+        }
+        if ($statusKrs) {
+            $itemsQuery->where('k.status_krs', $statusKrs);
+        }
+        if ($nilaiTerkunci !== null && $nilaiTerkunci !== '') {
+            $itemsQuery->where('k.nilai_terkunci', (int) $nilaiTerkunci);
+        }
+
+        $items = $itemsQuery
             ->orderByDesc('k.id')
             ->paginate(10)
             ->withQueryString();
@@ -87,6 +118,12 @@ class AdminAkademikController extends Controller
         return view('akademik.generate-khs', [
             'title' => 'Generate KHS',
             'items' => $items,
+            'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'prodiList' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
+            'selectedTahunAkademikId' => $tahunAkademikId,
+            'selectedProdiId' => $prodiId,
+            'selectedStatusKrs' => $statusKrs,
+            'selectedNilaiTerkunci' => $nilaiTerkunci,
         ]);
     }
 
@@ -309,6 +346,8 @@ class AdminAkademikController extends Controller
     public function monitoringKrs(Request $request)
     {
         $tahunAkademikId = $request->query('tahun_akademik_id');
+        $prodiId = $request->query('prodi_id');
+        $statusKrs = $request->query('status_krs');
 
         $query = DB::table('krs as k')
             ->join('mahasiswa as m', 'm.id', '=', 'k.mahasiswa_id')
@@ -332,6 +371,12 @@ class AdminAkademikController extends Controller
         if ($tahunAkademikId) {
             $query->where('k.tahun_akademik_id', $tahunAkademikId);
         }
+        if ($prodiId) {
+            $query->where('m.prodi_id', $prodiId);
+        }
+        if ($statusKrs) {
+            $query->where('k.status_krs', $statusKrs);
+        }
 
         $items = $query->paginate(10)->withQueryString();
 
@@ -339,7 +384,10 @@ class AdminAkademikController extends Controller
             'title' => 'Monitoring KRS',
             'items' => $items,
             'tahunAkademikList' => DB::table('tahun_akademik')->orderByDesc('id')->get(),
+            'prodiList' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
             'selectedTahunAkademikId' => $tahunAkademikId,
+            'selectedProdiId' => $prodiId,
+            'selectedStatusKrs' => $statusKrs,
         ]);
     }
 
@@ -347,6 +395,7 @@ class AdminAkademikController extends Controller
     {
         $tahunAkademikId = $request->query('tahun_akademik_id');
         $prodiId = $request->query('prodi_id');
+        $statusKrs = $request->query('status_krs');
 
         $query = DB::table('krs_detail as kd')
             ->join('krs as k', 'k.id', '=', 'kd.krs_id')
@@ -378,6 +427,9 @@ class AdminAkademikController extends Controller
         if ($prodiId) {
             $query->where('m.prodi_id', $prodiId);
         }
+        if ($statusKrs) {
+            $query->where('k.status_krs', $statusKrs);
+        }
 
         $items = $query->paginate(10)->withQueryString();
 
@@ -388,6 +440,7 @@ class AdminAkademikController extends Controller
             'selectedTahunAkademikId' => $tahunAkademikId,
             'prodiList' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
             'selectedProdiId' => $prodiId,
+            'selectedStatusKrs' => $statusKrs,
         ]);
     }
 
@@ -395,16 +448,20 @@ class AdminAkademikController extends Controller
     {
         $tahunAkademikId = $request->query('tahun_akademik_id');
         $dosenId = $request->query('dosen_id');
+        $prodiId = $request->query('prodi_id');
 
         $summaryQuery = DB::table('evaluasi_dosen as ed')
             ->join('dosen as d', 'd.id', '=', 'ed.dosen_id')
             ->join('mata_kuliah as mk', 'mk.id', '=', 'ed.mata_kuliah_id')
+            ->join('program_studi as p', 'p.id', '=', 'mk.prodi_id')
             ->join('tahun_akademik as ta', 'ta.id', '=', 'ed.tahun_akademik_id')
             ->whereNotNull('ed.submitted_at')
             ->select(
                 'ed.dosen_id',
                 'ed.mata_kuliah_id',
                 'ed.tahun_akademik_id',
+                'p.id as prodi_id',
+                'p.nama_prodi',
                 'd.nama as nama_dosen',
                 DB::raw("CONCAT(mk.kode_mk, ' - ', mk.nama_mk) as mata_kuliah"),
                 'ta.tahun',
@@ -415,13 +472,16 @@ class AdminAkademikController extends Controller
                 DB::raw('ROUND(AVG(ed.nilai_3), 2) as avg_3'),
                 DB::raw('ROUND((AVG(ed.nilai_1) + AVG(ed.nilai_2) + AVG(ed.nilai_3)) / 3, 2) as rata_rata')
             )
-            ->groupBy('ed.dosen_id', 'ed.mata_kuliah_id', 'ed.tahun_akademik_id', 'd.nama', 'mk.kode_mk', 'mk.nama_mk', 'ta.tahun', 'ta.semester');
+            ->groupBy('ed.dosen_id', 'ed.mata_kuliah_id', 'ed.tahun_akademik_id', 'p.id', 'p.nama_prodi', 'd.nama', 'mk.kode_mk', 'mk.nama_mk', 'ta.tahun', 'ta.semester');
 
         if ($tahunAkademikId) {
             $summaryQuery->where('ed.tahun_akademik_id', $tahunAkademikId);
         }
         if ($dosenId) {
             $summaryQuery->where('ed.dosen_id', $dosenId);
+        }
+        if ($prodiId) {
+            $summaryQuery->where('mk.prodi_id', $prodiId);
         }
 
         $summary = $summaryQuery
@@ -436,6 +496,8 @@ class AdminAkademikController extends Controller
             'selectedTahunAkademikId' => $tahunAkademikId,
             'dosenList' => DB::table('dosen')->orderBy('nama')->get(),
             'selectedDosenId' => $dosenId,
+            'prodiList' => DB::table('program_studi')->whereNull('deleted_at')->orderBy('nama_prodi')->get(),
+            'selectedProdiId' => $prodiId,
         ]);
     }
 }

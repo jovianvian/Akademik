@@ -9,6 +9,33 @@
                     <p class="mt-1 text-sm text-gray-500">Pantau status pengisian KRS mahasiswa per periode.</p>
                 </div>
             </div>
+            <div class="admin-toolbar mt-3">
+                <input type="text" class="input-select w-full md:w-80" placeholder="Search mahasiswa/prodi..." data-live-search-target="#monitoringKrsTable">
+                <form method="GET" action="{{ route('akademik.monitoring-krs.index') }}" class="flex flex-wrap items-center gap-2">
+                    <select name="tahun_akademik_id" class="input-select">
+                        <option value="">Semua Periode</option>
+                        @foreach($tahunAkademikList as $ta)
+                            <option value="{{ $ta->id }}" @selected((string) ($selectedTahunAkademikId ?? '') === (string) $ta->id)>{{ $ta->tahun }} {{ strtoupper($ta->semester) }}</option>
+                        @endforeach
+                    </select>
+                    <select name="prodi_id" class="input-select">
+                        <option value="">Semua Prodi</option>
+                        @foreach($prodiList as $p)
+                            <option value="{{ $p->id }}" @selected((string) ($selectedProdiId ?? '') === (string) $p->id)>{{ $p->nama_prodi }}</option>
+                        @endforeach
+                    </select>
+                    <select name="status_krs" class="input-select">
+                        <option value="">Semua Status KRS</option>
+                        <option value="draft" @selected(($selectedStatusKrs ?? '') === 'draft')>DRAFT</option>
+                        <option value="final" @selected(($selectedStatusKrs ?? '') === 'final')>FINAL</option>
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
+                <div class="flex items-center gap-2">
+                    <button type="button" class="btn-secondary" disabled>Export CSV</button>
+                    <button type="button" class="btn-secondary" disabled>Export Excel</button>
+                </div>
+            </div>
             <div class="mt-5 table-wrap">
                 <table class="table-base" id="monitoringKrsTable">
                     <thead class="bg-gray-50">
@@ -41,4 +68,3 @@
         </article>
     </section>
 @endsection
-

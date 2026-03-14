@@ -10,6 +10,33 @@
         <x-slot:toolbar>
             <x-admin.toolbar-filter>
                 <input type="text" class="input-select w-full md:w-80" placeholder="Search mata kuliah/dosen/ruang..." data-live-search-target="#jadwalTable">
+                <form method="GET" action="{{ route('master.jadwal.index') }}" class="flex flex-wrap items-center gap-2">
+                    <select name="tahun_akademik_id" class="input-select">
+                        <option value="">Semua Periode</option>
+                        @foreach($tahunAkademik as $ta)
+                            <option value="{{ $ta->id }}" @selected((string) ($selectedTahunAkademikId ?? '') === (string) $ta->id)>{{ $ta->tahun }} {{ ucfirst($ta->semester) }}</option>
+                        @endforeach
+                    </select>
+                    <select name="prodi_id" class="input-select">
+                        <option value="">Semua Prodi</option>
+                        @foreach($prodi as $p)
+                            <option value="{{ $p->id }}" @selected((string) ($selectedProdiId ?? '') === (string) $p->id)>{{ $p->nama_prodi }}</option>
+                        @endforeach
+                    </select>
+                    <select name="dosen_id" class="input-select">
+                        <option value="">Semua Dosen</option>
+                        @foreach($dosen as $d)
+                            <option value="{{ $d->id }}" @selected((string) ($selectedDosenId ?? '') === (string) $d->id)>{{ $d->nama }}</option>
+                        @endforeach
+                    </select>
+                    <select name="hari" class="input-select">
+                        <option value="">Semua Hari</option>
+                        @foreach(['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'] as $h)
+                            <option value="{{ $h }}" @selected(($selectedHari ?? '') === $h)>{{ $h }}</option>
+                        @endforeach
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
                 <div class="flex items-center gap-2">
                     <button type="button" class="btn-secondary" disabled>Export CSV</button>
                     <button type="button" class="btn-secondary" disabled>Export Excel</button>

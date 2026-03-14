@@ -10,6 +10,20 @@
         <x-slot:toolbar>
             <x-admin.toolbar-filter>
                 <input type="text" class="input-select w-full md:w-80" placeholder="Search dosen/jabatan..." data-live-search-target="#jabatanDosenTable">
+                <form method="GET" action="{{ route('master.jabatan-dosen.index') }}" class="flex items-center gap-2">
+                    <select name="jabatan" class="input-select">
+                        <option value="">Semua Jabatan</option>
+                        @foreach($jabatanOptions as $jabatan)
+                            <option value="{{ $jabatan }}" @selected(($selectedJabatan ?? '') === $jabatan)>{{ $jabatan }}</option>
+                        @endforeach
+                    </select>
+                    <select name="status_aktif" class="input-select">
+                        <option value="">Semua Status</option>
+                        <option value="1" @selected((string) ($selectedStatusAktif ?? '') === '1')>Aktif</option>
+                        <option value="0" @selected((string) ($selectedStatusAktif ?? '') === '0')>Nonaktif</option>
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
                 <div class="flex items-center gap-2">
                     <button type="button" class="btn-secondary" disabled>Export CSV</button>
                     <button type="button" class="btn-secondary" disabled>Export Excel</button>

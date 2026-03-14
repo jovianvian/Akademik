@@ -10,6 +10,27 @@
         <x-slot:toolbar>
             <x-admin.toolbar-filter>
                 <input type="text" class="input-select w-full md:w-80" placeholder="Search kode/nama/prodi..." data-live-search-target="#mataKuliahTable">
+                <form method="GET" action="{{ route('master.mata-kuliah.index') }}" class="flex items-center gap-2">
+                    <select name="fakultas_id" class="input-select">
+                        <option value="">Semua Fakultas</option>
+                        @foreach($fakultas as $f)
+                            <option value="{{ $f->id }}" @selected((string) ($selectedFakultasId ?? '') === (string) $f->id)>{{ $f->nama_fakultas }}</option>
+                        @endforeach
+                    </select>
+                    <select name="prodi_id" class="input-select">
+                        <option value="">Semua Prodi</option>
+                        @foreach($prodi as $p)
+                            <option value="{{ $p->id }}" @selected((string) ($selectedProdiId ?? '') === (string) $p->id)>{{ $p->nama_prodi }}</option>
+                        @endforeach
+                    </select>
+                    <select name="semester" class="input-select">
+                        <option value="">Semua Semester</option>
+                        @for($sem = 1; $sem <= 14; $sem++)
+                            <option value="{{ $sem }}" @selected((string) ($selectedSemester ?? '') === (string) $sem)>Semester {{ $sem }}</option>
+                        @endfor
+                    </select>
+                    <button class="btn-compact" type="submit">Filter</button>
+                </form>
                 <div class="flex items-center gap-2">
                     <button type="button" class="btn-secondary" disabled>Export CSV</button>
                     <button type="button" class="btn-secondary" disabled>Export Excel</button>
